@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/alexdao/13.git"
+    "url": "git+https://github.com/alexdao/kindling.git"
   },
   "author": "Kevin He, Alex Dao, Danny Oh, Jiawei Zhang",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/alexdao/13/issues"
+    "url": "https://github.com/alexdao/kindling/issues"
   },
-  "homepage": "https://github.com/alexdao/13#readme",
+  "homepage": "https://github.com/alexdao/kindling#readme",
   "dependencies": {
     "babel-preset-es2015": "^6.18.0",
     "babel-preset-react": "^6.16.0",
