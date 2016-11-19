@@ -2,10 +2,10 @@
   "name": "kindling",
   "version": "1.0.0",
   "description": "Providing both sides to a news article perspective.",
-  "main": "src/main.js",
+  "main": "src/browser_action/main.js",
   "scripts": {
-    "watch": "watchify -t [ babelify ] src/main.js -o src/browser_action/bundle.js -v",
-    "build": "browserify -t [ babelify ] src/main.js  | uglifyjs -mc warnings=false > src/browser_action/bundle.js"
+    "watch": "watchify -t [ babelify ] src/browser_action/main.js -o src/browser_action/bundle.js -v",
+    "build": "browserify -t [ babelify ] src/browser_action/main.js  | uglifyjs -mc warnings=false > src/browser_action/bundle.js"
   },
   "repository": {
     "type": "git",
