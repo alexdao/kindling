@@ -20393,12 +20393,21 @@ var Messages = exports.Messages = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (Messages.__proto__ || Object.getPrototypeOf(Messages)).call(this, props));
 
     _this.state = {
-      messages: _this.retrieveMessages()
+      messages: _this.retrieveMessages(),
+      sendPressed: false,
+      sending: false,
+      composerValue: ''
     };
     return _this;
   }
 
   _createClass(Messages, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var container = document.getElementById('messages-container');
+      container.scrollTop = container.scrollHeight;
+    }
+  }, {
     key: "retrieveMessages",
     value: function retrieveMessages() {
       return [{
@@ -20406,20 +20415,31 @@ var Messages = exports.Messages = function (_React$Component) {
         sender: {
           name: "Kevin",
           reaction: "Approve"
-        }
+        },
+        self: true
       }, {
         body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
         sender: {
           name: "Alex",
           reaction: "Disapprove"
-        }
+        },
+        self: false
       }, {
         body: "Hey!",
         sender: {
           name: "Danny",
           reaction: "Indifferent"
-        }
+        },
+        self: false
       }];
+    }
+  }, {
+    key: "handleMessageChange",
+    value: function handleMessageChange(event) {
+      console.log('new value:', event.target.value);
+      this.setState({
+        composerValue: event.target.value
+      });
     }
   }, {
     key: "renderMessages",
@@ -20431,7 +20451,7 @@ var Messages = exports.Messages = function (_React$Component) {
           { key: index + "-message", className: "message-item" },
           React.createElement(
             "div",
-            { className: "message-sender-info" },
+            { className: "message-sender-info unselectable" },
             React.createElement(
               "div",
               { className: "message-sender" },
@@ -20451,7 +20471,7 @@ var Messages = exports.Messages = function (_React$Component) {
           ),
           React.createElement(
             "div",
-            { className: "message-body" },
+            { className: message.self ? "message-body self" : "message-body other" },
             message.body
           )
         );
@@ -20460,24 +20480,98 @@ var Messages = exports.Messages = function (_React$Component) {
       return messageElements;
     }
   }, {
+    key: "sendPressed",
+    value: function sendPressed() {
+      if (this.state.composerValue.length == 0) {
+        return;
+      }
+      this.setState({
+        sendPressed: true
+      });
+    }
+  }, {
+    key: "sendReleased",
+    value: function sendReleased(send) {
+      var _this2 = this;
+
+      if (!send && this.state.sending || this.state.composerValue.length == 0) {
+        return;
+      }
+      if (send) {
+        console.log("sending message:", this.state.composerValue);
+        document.getElementById("composer").disabled = true;
+        setTimeout(function () {
+          var messagesList = _this2.state.messages;
+          messagesList.push({
+            body: _this2.state.composerValue,
+            sender: {
+              name: "Kevin",
+              reaction: "Approve"
+            },
+            self: true
+          });
+          _this2.setState({
+            messages: messagesList,
+            sending: false,
+            composerValue: ''
+          }, function () {
+            document.getElementById("composer").disabled = false;
+            var container = document.getElementById('messages-container');
+            container.scrollTop = container.scrollHeight;
+          });
+        }, 1000);
+      }
+      this.setState({
+        sendPressed: false,
+        sending: send
+      });
+    }
+  }, {
     key: "render",
     value: function render() {
+      var sendButtonClass = "message-composer-send unselectable";
+      if (this.state.composerValue.length == 0) {
+        sendButtonClass += " disabled";
+      } else if (this.state.sendPressed) {
+        sendButtonClass += " pressed";
+      } else if (this.state.sending) {
+        sendButtonClass += " sending";
+      }
       return React.createElement(
         "div",
         { className: "messages" },
         React.createElement(
           "div",
-          { className: "messages-container" },
+          { id: "messages-container", className: "messages-container" },
           this.renderMessages()
         ),
         React.createElement(
           "div",
-          { className: "message-composer" },
+          { className: "message-composer unselectable" },
           React.createElement("input", {
             type: "text",
             id: "composer",
             className: "message-composer-input",
-            placeholder: "Send a message..." })
+            placeholder: "Send a message...",
+            value: this.state.composerValue,
+            onChange: this.handleMessageChange.bind(this) }),
+          React.createElement(
+            "div",
+            {
+              className: sendButtonClass,
+              onMouseDown: this.sendPressed.bind(this),
+              onMouseUp: this.sendReleased.bind(this, true),
+              onMouseLeave: this.sendReleased.bind(this, false) },
+            React.createElement(
+              "div",
+              { className: "message-composer-send-label" },
+              this.state.sending ? React.createElement(
+                "div",
+                null,
+                React.createElement("img", { className: "sending-loading-spinner", src: "assets/spinner.gif" })
+              ) : "Send"
+            )
+          )
         )
       );
     }
