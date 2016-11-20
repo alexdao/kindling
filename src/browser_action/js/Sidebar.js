@@ -45,7 +45,11 @@ export class Sidebar extends React.Component {
       let tabElement = (
         <div
           key={index + "-chat-tab"}
-          className="sidebar-chat-tab"
+          className={
+            this.props.currentChatIndex == index + 1
+            ? "sidebar-chat-tab selected"
+            : "sidebar-chat-tab"
+          }
           onMouseEnter={this.enterTab.bind(this, index + 1)}
           onMouseLeave={this.leaveTab.bind(this)}>
           <div className="sidebar-chat-tab-text">
@@ -84,7 +88,11 @@ export class Sidebar extends React.Component {
       <div>
         <div className="sidebar">
           <div
-            className="sidebar-chat-tab group"
+            className={
+              this.props.currentChatIndex == 0
+              ? "sidebar-chat-tab group selected"
+              : "sidebar-chat-tab group"
+            }
             onMouseEnter={this.enterTab.bind(this, 0)}
             onMouseLeave={this.leaveTab.bind(this)}>
             <div className="sidebar-chat-tab-text">

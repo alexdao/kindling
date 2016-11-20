@@ -20335,6 +20335,22 @@ var App = exports.App = function (_React$Component) {
       });
       socket.on('privateChatResponse', function (payload) {
         console.log(payload);
+        var data = JSON.parse(payload);
+        var newUser = {
+          name: data.name,
+          reaction: data.reaction
+        };
+        var newChatId = data.chatId;
+        var chatUsers = _this3.state.chatUsers;
+        var chats = _this3.state.chats;
+        chatUsers.push(newUser);
+        chats.push(newChatId);
+        _this3.setState({
+          currentChatIndex: chats.length - 1,
+          currentChatId: newChatId,
+          chatUsers: chatUsers,
+          chats: chats
+        });
       });
     }
   }, {
@@ -20357,6 +20373,7 @@ var App = exports.App = function (_React$Component) {
         'div',
         null,
         React.createElement(Sidebar, {
+          currentChatIndex: this.state.currentChatIndex,
           chats: this.state.chats,
           chatUsers: this.state.chatUsers,
           addChat: this.addChat.bind(this),
@@ -20953,7 +20970,7 @@ var Sidebar = exports.Sidebar = function (_React$Component) {
           "div",
           {
             key: index + "-chat-tab",
-            className: "sidebar-chat-tab",
+            className: _this2.props.currentChatIndex == index + 1 ? "sidebar-chat-tab selected" : "sidebar-chat-tab",
             onMouseEnter: _this2.enterTab.bind(_this2, index + 1),
             onMouseLeave: _this2.leaveTab.bind(_this2) },
           React.createElement(
@@ -21002,7 +21019,7 @@ var Sidebar = exports.Sidebar = function (_React$Component) {
           React.createElement(
             "div",
             {
-              className: "sidebar-chat-tab group",
+              className: this.props.currentChatIndex == 0 ? "sidebar-chat-tab group selected" : "sidebar-chat-tab group",
               onMouseEnter: this.enterTab.bind(this, 0),
               onMouseLeave: this.leaveTab.bind(this) },
             React.createElement(

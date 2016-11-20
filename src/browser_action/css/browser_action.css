@@ -198,7 +198,8 @@ body {
   margin-top: 14px;
 }
 
-.sidebar-chat-tab:hover {
+.sidebar-chat-tab:hover,
+.sidebar-chat-tab.selected {
   color: var(--theme-color);
   background-color: white;
 }

@@ -61,6 +61,22 @@ export class App extends React.Component {
     });
     socket.on('privateChatResponse', (payload) => {
       console.log(payload);
+      let data = JSON.parse(payload);
+      let newUser = {
+        name: data.name,
+        reaction: data.reaction
+      }
+      let newChatId = data.chatId;
+      let chatUsers = this.state.chatUsers;
+      let chats = this.state.chats;
+      chatUsers.push(newUser);
+      chats.push(newChatId);
+      this.setState({
+        currentChatIndex: chats.length - 1,
+        currentChatId: newChatId,
+        chatUsers: chatUsers,
+        chats: chats
+      });
     });
   }
 
@@ -79,6 +95,7 @@ export class App extends React.Component {
     return (
       <div>
         <Sidebar
+          currentChatIndex={this.state.currentChatIndex}
           chats={this.state.chats}
           chatUsers={this.state.chatUsers}
           addChat={this.addChat.bind(this)}
