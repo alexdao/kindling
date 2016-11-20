@@ -276,6 +276,7 @@ body {
   display: flex;
   flex-direction: row;
   align-items: center;
+  margin-top: 5px;
 }
 
 .header-private-chat-user-reaction-icon {
@@ -288,6 +289,7 @@ body {
   font-size: 20px;
   font-weight: bold;
   margin-left: 10px;
+  font-family: "Merriweather", serif;
 }
 
 /* MESSAGES */

@@ -4,10 +4,6 @@ const Reactions = require('./Reactions');
 export class Header extends React.Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      readers: 538
-    }
   }
 
   retrieveArticlePublisher() {
@@ -39,7 +35,7 @@ export class Header extends React.Component {
               <div className="header-subtitle">
                 {articlePublisher.toUpperCase()}
                 &nbsp; &bull; &nbsp;
-                {this.state.readers + " Readers"}
+                {this.props.chatSize + " Readers"}
               </div>
             </div>
           )

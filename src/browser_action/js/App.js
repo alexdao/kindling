@@ -16,7 +16,8 @@ export class App extends React.Component {
       currentChatId: '',
       currentChatIndex: -1,
       chats: [],
-      chatUsers: []
+      chatUsers: [],
+      chatSize: 0
     }
   }
 
@@ -79,6 +80,15 @@ export class App extends React.Component {
         chats: chats
       });
     });
+
+    socket.on('chatSize', (payload) => {
+      let data = JSON.parse(payload);
+      if (data.chatId = this.state.chats[0]) {
+        this.setState({
+          chatSize: data.size
+        });
+      }
+    });
   }
 
   addChat() {
@@ -119,7 +129,8 @@ export class App extends React.Component {
           uri={this.state.uri}
           chats={this.state.chats}
           chatUsers={this.state.chatUsers}
-          currentChatIndex={this.state.currentChatIndex}/>
+          currentChatIndex={this.state.currentChatIndex}
+          chatSize={this.state.chatSize}/>
         <Messages
           myName={this.state.name}
           myReaction={this.state.reaction}

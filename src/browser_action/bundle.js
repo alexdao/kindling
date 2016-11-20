@@ -20282,7 +20282,8 @@ var App = exports.App = function (_React$Component) {
       currentChatId: '',
       currentChatIndex: -1,
       chats: [],
-      chatUsers: []
+      chatUsers: [],
+      chatSize: 0
     };
     return _this;
   }
@@ -20353,6 +20354,15 @@ var App = exports.App = function (_React$Component) {
           chats: chats
         });
       });
+
+      socket.on('chatSize', function (payload) {
+        var data = JSON.parse(payload);
+        if (data.chatId = _this3.state.chats[0]) {
+          _this3.setState({
+            chatSize: data.size
+          });
+        }
+      });
     }
   }, {
     key: 'addChat',
@@ -20398,7 +20408,8 @@ var App = exports.App = function (_React$Component) {
           uri: this.state.uri,
           chats: this.state.chats,
           chatUsers: this.state.chatUsers,
-          currentChatIndex: this.state.currentChatIndex }),
+          currentChatIndex: this.state.currentChatIndex,
+          chatSize: this.state.chatSize }),
         React.createElement(Messages, {
           myName: this.state.name,
           myReaction: this.state.reaction,
@@ -20447,12 +20458,7 @@ var Header = exports.Header = function (_React$Component) {
   function Header(props) {
     _classCallCheck(this, Header);
 
-    var _this = _possibleConstructorReturn(this, (Header.__proto__ || Object.getPrototypeOf(Header)).call(this, props));
-
-    _this.state = {
-      readers: 538
-    };
-    return _this;
+    return _possibleConstructorReturn(this, (Header.__proto__ || Object.getPrototypeOf(Header)).call(this, props));
   }
 
   _createClass(Header, [{
@@ -20490,7 +20496,7 @@ var Header = exports.Header = function (_React$Component) {
             { className: 'header-subtitle' },
             articlePublisher.toUpperCase(),
             '\xA0 \u2022 \xA0',
-            this.state.readers + " Readers"
+            this.props.chatSize + " Readers"
           )
         ) : React.createElement(
           'div',
