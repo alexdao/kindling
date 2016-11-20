@@ -82,8 +82,9 @@ export class App extends React.Component {
     });
 
     socket.on('chatSize', (payload) => {
+      console.log('payload', payload);
       let data = JSON.parse(payload);
-      if (data.chatId = this.state.chats[0]) {
+      if (data.chatId == this.state.chats[0]) {
         this.setState({
           chatSize: data.size
         });

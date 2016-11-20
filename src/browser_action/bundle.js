@@ -20356,8 +20356,9 @@ var App = exports.App = function (_React$Component) {
       });
 
       socket.on('chatSize', function (payload) {
+        console.log('payload', payload);
         var data = JSON.parse(payload);
-        if (data.chatId = _this3.state.chats[0]) {
+        if (data.chatId == _this3.state.chats[0]) {
           _this3.setState({
             chatSize: data.size
           });
