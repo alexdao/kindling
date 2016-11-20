@@ -13,7 +13,10 @@ export class Messages extends React.Component {
     }
   }
 
-  handleMessageReceive(msg_formatted) {
+  handleMessageReceive(msg) {
+    console.log('received message?');
+    let msg_formatted = JSON.parse(msg);
+    console.log('msg', msg_formatted);
     let text = msg_formatted.msg;
     let name = msg_formatted.name;
 
@@ -42,8 +45,21 @@ export class Messages extends React.Component {
     container.scrollTop = container.scrollHeight;
   }
 
-  getChatId() {
-    return this.state.chatId;
+  componentWillUpdate(nextProps, nextState) {
+    let handler = this.handleMessageReceive.bind(this);
+    if (nextProps == this.props && nextState != this.state) {
+      return;
+    }
+    console.log(nextProps);
+    let socket = nextProps.socket;
+    if (socket == null) {
+      console.log('error1');
+      return;
+    }
+    socket.on('msg', (msg) => {
+      console.log('handler?');
+      handler(msg);
+    });
   }
 
   retrieveMessages() {

@@ -9,12 +9,10 @@ export class App extends React.Component {
     super(props);
 
     this.state = {
-      currentChat: 0,
-      chatList: [],
       name: '',
       reaction: '',
       initialized: false,
-      socket: io('https://frozen-waters-93748.herokuapp.com/'),
+      socket: null
     }
   }
 
@@ -23,27 +21,14 @@ export class App extends React.Component {
       console.log(tab);
       this.setState({
         uri: tab.url,
-        title: tab.title,
+        title: tab.title
       });
-    });
-    socket.on('chatId', (payload) => {
-       chatList.push(
-        <Messages
-          myName={this.state.name}
-          chatId={payload.chatId}
-          myReaction={this.state.reaction}
-          socket={this.state.socket}
-          title={this.state.title}/>
-        );
-    });
-    socket.on('msg', (msg) => {
-      handleMessageReceive(msg);
     });
   }
 
-
   setUserInfo(info) {
     console.log('info set:', info);
+    let socket = io('https://frozen-waters-93748.herokuapp.com/');
     console.log('set');
     let payload = {
       uri: this.state.uri,
@@ -58,31 +43,20 @@ export class App extends React.Component {
       name: info.name,
       reaction: info.reaction,
       initialized: true,
+      socket: socket
     });
   }
 
-   handleMessageReceive(msg) {
-    const msg_formatted = JSON.parse(msg);
-    const chatId = msg_formatted.chatId;
-    for (i = 0; i < chatList.length; i++) {
-      if (chatList[i].getChatId() == chatId) {
-        chatList[i].handleMessageReceive(msg_formatted);
-        break;
-      }
-    }
-  }
-
   render() {
-    if (this.state.currentChat >= 0) {
-      messages = this.state.chatList[this.state.currentChat];
-    } else {
-      messages = null;
-    }
     return (
       <div>
         <Sidebar/>
         <Header title={this.state.title}/>
-        {messages}
+        <Messages
+          myName={this.state.name}
+          myReaction={this.state.reaction}
+          socket={this.state.socket}
+          title={this.state.title}/>
         <div className={!this.state.initialized ? "reaction-screen" : "reaction-screen hidden"}>
           <ReactionScreen setUserInfo={this.setUserInfo.bind(this)}/>
         </div>
