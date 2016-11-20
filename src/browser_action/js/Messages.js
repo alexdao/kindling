@@ -1,9 +1,5 @@
 const React = require('react');
-const Reactions = {
-  "Approve": "smiling",
-  "Indifferent": "indifferent",
-  "Disapprove": "angry"
-}
+const Reactions = require('./Reactions');
 
 export class Messages extends React.Component {
   constructor(props) {
@@ -28,7 +24,7 @@ export class Messages extends React.Component {
         body: "Hey!",
         sender: {
           name: "Kevin",
-          reaction: "Approve"
+          reaction: Reactions.reactions[0]
         },
         self: true
       },
@@ -36,15 +32,15 @@ export class Messages extends React.Component {
         body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
         sender: {
           name: "Alex",
-          reaction: "Disapprove"
+          reaction: Reactions.reactions[1]
         },
         self: false
       },
       {
-        body: "Hey!",
+        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
         sender: {
           name: "Danny",
-          reaction: "Indifferent"
+          reaction: Reactions.reactions[2]
         },
         self: false
       }
@@ -52,7 +48,6 @@ export class Messages extends React.Component {
   }
 
   handleMessageChange(event) {
-    console.log('new value:', event.target.value);
     this.setState({
       composerValue: event.target.value
     });
@@ -72,7 +67,7 @@ export class Messages extends React.Component {
             <div className="message-sender-reaction">
               <img
                 src={
-                  "assets/" + Reactions[message.sender.reaction] + '_emoji.png'
+                  "assets/" + Reactions.reactionIcons[message.sender.reaction] + '_emoji.png'
                 }
                 className="message-sender-reaction-icon"/>
             </div>
@@ -147,13 +142,19 @@ export class Messages extends React.Component {
           {this.renderMessages()}
         </div>
         <div className="message-composer unselectable">
-          <input
-            type="text"
-            id="composer"
-            className="message-composer-input"
-            placeholder="Send a message..."
-            value={this.state.composerValue}
-            onChange={this.handleMessageChange.bind(this)}/>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            this.sendReleased(e, true);
+          }}>
+            <input
+              type="text"
+              id="composer"
+              className="message-composer-input"
+              placeholder="Send a message..."
+              value={this.state.composerValue}
+              onChange={this.handleMessageChange.bind(this)}/>
+            <input type="submit" style={{display: 'none'}}/>
+          </form>
           <div
             className={sendButtonClass}
             onMouseDown={this.sendPressed.bind(this)}
