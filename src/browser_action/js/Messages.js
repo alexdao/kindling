@@ -64,10 +64,13 @@ export class Messages extends React.Component {
       return;
     }
     socket.on('msg', (msg) => {
-      console.log('handler?');
       handler(msg);
     });
-    nextState.initialized = true
+
+    socket.on('disconnect_client', (payload) => {
+      console.log('someone disconnected', payload);
+    });
+    nextState.initialized = true;
   }
 
   handleMessageChange(event) {

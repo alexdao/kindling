@@ -102,7 +102,9 @@ export class App extends React.Component {
           chatUsers={this.state.chatUsers}
           addChat={this.addChat.bind(this)}
           switchChat={this.switchChat.bind(this)}/>
-        <Header title={this.state.title}/>
+        <Header
+          title={this.state.title}
+          uri={this.state.uri}/>
         <Messages
           myName={this.state.name}
           myReaction={this.state.reaction}

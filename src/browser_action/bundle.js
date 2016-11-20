@@ -20380,7 +20380,9 @@ var App = exports.App = function (_React$Component) {
           chatUsers: this.state.chatUsers,
           addChat: this.addChat.bind(this),
           switchChat: this.switchChat.bind(this) }),
-        React.createElement(Header, { title: this.state.title }),
+        React.createElement(Header, {
+          title: this.state.title,
+          uri: this.state.uri }),
         React.createElement(Messages, {
           myName: this.state.name,
           myReaction: this.state.reaction,
@@ -20405,7 +20407,7 @@ var App = exports.App = function (_React$Component) {
 module.exports = App;
 
 },{"./Header":178,"./Messages":179,"./ReactionScreen":180,"./Sidebar":182,"react":176}],178:[function(require,module,exports){
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -20436,27 +20438,35 @@ var Header = exports.Header = function (_React$Component) {
   }
 
   _createClass(Header, [{
-    key: "retrieveArticlePublisher",
+    key: 'retrieveArticlePublisher',
     value: function retrieveArticlePublisher() {
-      return "NYTimes";
+      if (!this.props.uri) {
+        return "";
+      }
+      var match = this.props.uri.match(/:\/\/(www[0-9]?\.)?(.[^/:]+)/i);
+      if (match != null && match.length > 2 && typeof match[2] === 'string' && match[2].length > 0) {
+        return match[2];
+      } else {
+        return "";
+      }
     }
   }, {
-    key: "render",
+    key: 'render',
     value: function render() {
       var articlePublisher = this.retrieveArticlePublisher();
       return React.createElement(
-        "div",
-        { className: "header" },
+        'div',
+        { className: 'header' },
         React.createElement(
-          "div",
-          { className: "header-article-title" },
+          'div',
+          { className: 'header-article-title' },
           this.props.title
         ),
         React.createElement(
-          "div",
-          { className: "header-subtitle" },
+          'div',
+          { className: 'header-subtitle' },
           articlePublisher.toUpperCase(),
-          "\xA0 \u2022 \xA0",
+          '\xA0 \u2022 \xA0',
           this.state.readers + " Readers"
         )
       );
@@ -20558,8 +20568,11 @@ var Messages = exports.Messages = function (_React$Component) {
         return;
       }
       socket.on('msg', function (msg) {
-        console.log('handler?');
         handler(msg);
+      });
+
+      socket.on('disconnect_client', function (payload) {
+        console.log('someone disconnected', payload);
       });
       nextState.initialized = true;
     }
