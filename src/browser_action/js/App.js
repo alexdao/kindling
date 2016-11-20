@@ -17,6 +17,16 @@ export class App extends React.Component {
 
   setUserInfo(info) {
     console.log('info set:', info);
+    let socket = io('https://frozen-waters-93748.herokuapp.com/');
+    let payload = {
+      uri: 'uri',
+      name: 'Kevin',
+      reaction: 'Approve',
+      title: 'title',
+      topic: 'topic',
+      bias: 'liberal'
+    }
+    socket.emit('init', JSON.stringify(payload));
     this.setState({
       name: info.name,
       reaction: info.reaction,

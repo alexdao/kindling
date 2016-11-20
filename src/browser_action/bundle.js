@@ -20286,6 +20286,16 @@ var App = exports.App = function (_React$Component) {
     key: 'setUserInfo',
     value: function setUserInfo(info) {
       console.log('info set:', info);
+      var socket = io('https://frozen-waters-93748.herokuapp.com/');
+      var payload = {
+        uri: 'uri',
+        name: 'Kevin',
+        reaction: 'Approve',
+        title: 'title',
+        topic: 'topic',
+        bias: 'liberal'
+      };
+      socket.emit('init', JSON.stringify(payload));
       this.setState({
         name: info.name,
         reaction: info.reaction,
@@ -20404,6 +20414,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var React = require('react');
 var Reactions = require('./Reactions');
+var socket = io('https://frozen-waters-93748.herokuapp.com/');
 
 var Messages = exports.Messages = function (_React$Component) {
   _inherits(Messages, _React$Component);
@@ -20412,6 +20423,33 @@ var Messages = exports.Messages = function (_React$Component) {
     _classCallCheck(this, Messages);
 
     var _this = _possibleConstructorReturn(this, (Messages.__proto__ || Object.getPrototypeOf(Messages)).call(this, props));
+
+    socket.on('msg', function (msg) {
+      var msg_formatted = JSON.parse(msg);
+      var text = msg_formatted.msg;
+      var name = msg_formatted.name;
+      console.log('text: ' + text);
+      console.log('name: ' + name);
+
+      var messagesList = this.state.messages;
+      messagesList.push({
+        body: text,
+        sender: {
+          name: name,
+          reaction: "Approve"
+        },
+        self: false
+      });
+      this.setState({
+        messages: messagesList,
+        sending: false,
+        composerValue: ''
+      }, function () {
+        document.getElementById("composer").disabled = false;
+        var container = document.getElementById('messages-container');
+        container.scrollTop = container.scrollHeight;
+      });
+    });
 
     _this.state = {
       messages: _this.retrieveMessages(),
@@ -20512,34 +20550,38 @@ var Messages = exports.Messages = function (_React$Component) {
   }, {
     key: 'sendReleased',
     value: function sendReleased(send) {
-      var _this2 = this;
-
       if (!send && this.state.sending || this.state.composerValue.length == 0) {
         return;
       }
       if (send) {
         console.log("sending message:", this.state.composerValue);
         document.getElementById("composer").disabled = true;
-        setTimeout(function () {
-          var messagesList = _this2.state.messages;
-          messagesList.push({
-            body: _this2.state.composerValue,
-            sender: {
-              name: "Kevin",
-              reaction: "Approve"
-            },
-            self: true
-          });
-          _this2.setState({
-            messages: messagesList,
-            sending: false,
-            composerValue: ''
-          }, function () {
-            document.getElementById("composer").disabled = false;
-            var container = document.getElementById('messages-container');
-            container.scrollTop = container.scrollHeight;
-          });
-        }, 1000);
+        var msgRequest = {
+          chatId: 0,
+          text: this.state.composerValue
+        };
+        socket.emit('chat msg', JSON.stringify(msgRequest));
+
+        // setTimeout(() => {
+        //   let messagesList = this.state.messages;
+        //   messagesList.push({
+        //     body: this.state.composerValue,
+        //     sender: {
+        //       name: "Kevin",
+        //       reaction: "Approve"
+        //     },
+        //     self: true
+        //   });
+        //   this.setState({
+        //     messages: messagesList,
+        //     sending: false,
+        //     composerValue: ''
+        //   }, () => {
+        //     document.getElementById("composer").disabled = false;
+        //     const container = document.getElementById('messages-container');
+        //     container.scrollTop = container.scrollHeight;
+        //   });
+        // }, 1000);
       }
       this.setState({
         sendPressed: false,
@@ -20549,7 +20591,7 @@ var Messages = exports.Messages = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this3 = this;
+      var _this2 = this;
 
       var sendButtonClass = "message-composer-send unselectable";
       if (this.state.composerValue.length == 0) {
@@ -20574,7 +20616,7 @@ var Messages = exports.Messages = function (_React$Component) {
             'form',
             { onSubmit: function onSubmit(e) {
                 e.preventDefault();
-                _this3.sendReleased(e, true);
+                _this2.sendReleased(e, true);
               } },
             React.createElement('input', {
               type: 'text',

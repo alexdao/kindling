@@ -1,9 +1,37 @@
 const React = require('react');
 const Reactions = require('./Reactions');
+const socket = io('https://frozen-waters-93748.herokuapp.com/');
 
 export class Messages extends React.Component {
   constructor(props) {
     super(props);
+
+    socket.on('msg', function(msg){
+      let msg_formatted = JSON.parse(msg);
+      let text = msg_formatted.msg;
+      let name = msg_formatted.name;
+      console.log('text: ' + text);
+      console.log('name: ' + name);
+
+      let messagesList = this.state.messages;
+      messagesList.push({
+        body: text,
+        sender: {
+          name: name,
+          reaction: "Approve"
+        },
+        self: false
+      });
+      this.setState({
+        messages: messagesList,
+        sending: false,
+        composerValue: ''
+      }, () => {
+        document.getElementById("composer").disabled = false;
+        const container = document.getElementById('messages-container');
+        container.scrollTop = container.scrollHeight;
+      });
+    });
 
     this.state = {
       messages: this.retrieveMessages(),
@@ -100,26 +128,32 @@ export class Messages extends React.Component {
     if (send) {
       console.log("sending message:", this.state.composerValue);
       document.getElementById("composer").disabled = true;
-      setTimeout(() => {
-        let messagesList = this.state.messages;
-        messagesList.push({
-          body: this.state.composerValue,
-          sender: {
-            name: "Kevin",
-            reaction: "Approve"
-          },
-          self: true
-        });
-        this.setState({
-          messages: messagesList,
-          sending: false,
-          composerValue: ''
-        }, () => {
-          document.getElementById("composer").disabled = false;
-          const container = document.getElementById('messages-container');
-          container.scrollTop = container.scrollHeight;
-        });
-      }, 1000);
+      let msgRequest = {
+        chatId: 0,
+        text: this.state.composerValue
+      }
+      socket.emit('chat msg', JSON.stringify(msgRequest));
+
+      // setTimeout(() => {
+      //   let messagesList = this.state.messages;
+      //   messagesList.push({
+      //     body: this.state.composerValue,
+      //     sender: {
+      //       name: "Kevin",
+      //       reaction: "Approve"
+      //     },
+      //     self: true
+      //   });
+      //   this.setState({
+      //     messages: messagesList,
+      //     sending: false,
+      //     composerValue: ''
+      //   }, () => {
+      //     document.getElementById("composer").disabled = false;
+      //     const container = document.getElementById('messages-container');
+      //     container.scrollTop = container.scrollHeight;
+      //   });
+      // }, 1000);
     }
     this.setState({
       sendPressed: false,
