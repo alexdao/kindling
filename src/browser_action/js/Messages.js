@@ -77,6 +77,10 @@ export class Messages extends React.Component {
         disconnectedUsers: disconnectedUsers
       });
     });
+    if (nextProps.currentChatId != this.props.currentChatId) {
+      let disconnectedUsers = this.state.disconnectedUsers;
+      document.getElementById("composer").disabled = this.state.disconnectedUsers.indexOf(nextProps.currentChatId) == -1
+    }
     nextState.initialized = true;
   }
 
@@ -173,9 +177,7 @@ export class Messages extends React.Component {
               onClick={() => {
                 document.getElementById("composer").disabled = false;
                 let chatsToMessages = this.state.chatsToMessages;
-                console.log(chatsToMessages);
                 chatsToMessages[this.props.currentChatId] = [];
-                console.log(chatsToMessages);
                 let disconnectedUsers = this.state.disconnectedUsers;
                 disconnectedUsers.splice(disconnectedUsers.indexOf(this.props.currentChatId), 1);
                 this.setState({

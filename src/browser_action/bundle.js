@@ -20637,6 +20637,10 @@ var Messages = exports.Messages = function (_React$Component) {
           disconnectedUsers: disconnectedUsers
         });
       });
+      if (nextProps.currentChatId != this.props.currentChatId) {
+        var disconnectedUsers = this.state.disconnectedUsers;
+        document.getElementById("composer").disabled = this.state.disconnectedUsers.indexOf(nextProps.currentChatId) == -1;
+      }
       nextState.initialized = true;
     }
   }, {
@@ -20757,9 +20761,7 @@ var Messages = exports.Messages = function (_React$Component) {
                 onClick: function onClick() {
                   document.getElementById("composer").disabled = false;
                   var chatsToMessages = _this3.state.chatsToMessages;
-                  console.log(chatsToMessages);
                   chatsToMessages[_this3.props.currentChatId] = [];
-                  console.log(chatsToMessages);
                   var disconnectedUsers = _this3.state.disconnectedUsers;
                   disconnectedUsers.splice(disconnectedUsers.indexOf(_this3.props.currentChatId), 1);
                   _this3.setState({
