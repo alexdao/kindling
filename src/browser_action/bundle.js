@@ -20333,6 +20333,7 @@ var App = exports.App = function (_React$Component) {
           chats: chats
         });
       });
+
       socket.on('privateChatResponse', function (payload) {
         console.log(payload);
         var data = JSON.parse(payload);
@@ -20497,7 +20498,8 @@ var Messages = exports.Messages = function (_React$Component) {
       sendPressed: false,
       sending: false,
       composerValue: '',
-      chatsToMessages: {}
+      chatsToMessages: {},
+      initialized: false
     };
     return _this;
   }
@@ -20546,7 +20548,7 @@ var Messages = exports.Messages = function (_React$Component) {
     key: 'componentWillUpdate',
     value: function componentWillUpdate(nextProps, nextState) {
       var handler = this.handleMessageReceive.bind(this);
-      if (nextProps.socket == this.props.socket && nextState != this.state) {
+      if (this.state.initialized) {
         return;
       }
       console.log(nextProps);
@@ -20559,6 +20561,7 @@ var Messages = exports.Messages = function (_React$Component) {
         console.log('handler?');
         handler(msg);
       });
+      nextState.initialized = true;
     }
   }, {
     key: 'handleMessageChange',

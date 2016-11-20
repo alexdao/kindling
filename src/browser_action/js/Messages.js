@@ -9,7 +9,8 @@ export class Messages extends React.Component {
       sendPressed: false,
       sending: false,
       composerValue: '',
-      chatsToMessages: {}
+      chatsToMessages: {},
+      initialized: false,
     }
   }
 
@@ -53,7 +54,7 @@ export class Messages extends React.Component {
 
   componentWillUpdate(nextProps, nextState) {
     let handler = this.handleMessageReceive.bind(this);
-    if (nextProps.socket == this.props.socket && nextState != this.state) {
+    if (this.state.initialized) {
       return;
     }
     console.log(nextProps);
@@ -66,6 +67,7 @@ export class Messages extends React.Component {
       console.log('handler?');
       handler(msg);
     });
+    nextState.initialized = true
   }
 
   handleMessageChange(event) {

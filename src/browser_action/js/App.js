@@ -59,6 +59,7 @@ export class App extends React.Component {
         chats: chats
       });
     });
+
     socket.on('privateChatResponse', (payload) => {
       console.log(payload);
       let data = JSON.parse(payload);
