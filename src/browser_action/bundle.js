@@ -20384,10 +20384,11 @@ var App = exports.App = function (_React$Component) {
     value: function disconnectChat(index) {
       var chats = this.state.chats;
       var chatUsers = this.state.chatUsers;
-      chats.splice(index, 1);
-      chatUsers.splice(index, 1);
+      chats.splice(index - 1, 1);
+      chatUsers.splice(index - 1, 1);
       this.setState({
         currentChatIndex: 0,
+        currentChatId: chats[0],
         chats: chats,
         chatUsers: chatUsers
       });
@@ -20755,8 +20756,13 @@ var Messages = exports.Messages = function (_React$Component) {
                 className: 'ok-button',
                 onClick: function onClick() {
                   document.getElementById("composer").disabled = false;
+                  var chatsToMessages = _this3.state.chatsToMessages;
+                  console.log(chatsToMessages);
+                  delete chatsToMessages[_this3.props.chats[_this3.props.currentChatIndex]];
+                  console.log(chatsToMessages);
                   _this3.setState({
-                    disconnected: false
+                    disconnected: false,
+                    chatsToMessages: chatsToMessages
                   });
                   _this3.props.disconnectChat(_this3.props.currentChatIndex);
                 } },

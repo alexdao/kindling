@@ -170,8 +170,13 @@ export class Messages extends React.Component {
               className="ok-button"
               onClick={() => {
                 document.getElementById("composer").disabled = false;
+                let chatsToMessages = this.state.chatsToMessages;
+                console.log(chatsToMessages);
+                delete chatsToMessages[this.props.chats[this.props.currentChatIndex]];
+                console.log(chatsToMessages);
                 this.setState({
-                  disconnected: false
+                  disconnected: false,
+                  chatsToMessages: chatsToMessages
                 });
                 this.props.disconnectChat(this.props.currentChatIndex)
               }}>

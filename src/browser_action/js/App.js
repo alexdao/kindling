@@ -107,10 +107,11 @@ export class App extends React.Component {
   disconnectChat(index) {
     let chats = this.state.chats;
     let chatUsers = this.state.chatUsers;
-    chats.splice(index, 1);
-    chatUsers.splice(index, 1);
+    chats.splice(index - 1, 1);
+    chatUsers.splice(index - 1, 1);
     this.setState({
       currentChatIndex: 0,
+      currentChatId: chats[0],
       chats: chats,
       chatUsers: chatUsers
     });
