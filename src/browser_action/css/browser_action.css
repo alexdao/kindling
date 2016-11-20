@@ -223,6 +223,10 @@ body {
 
 .header-article-title {
   font-size: 18px;
+  width: 300px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
   padding: 10px;
   font-family: 'Merriweather', serif;
 }
@@ -323,6 +327,7 @@ body {
   margin-left: 20px;
   border-radius: 10px;
   box-shadow: 0 0 1px black;
+  min-height: 16px;
 }
 
 .message-body.other {

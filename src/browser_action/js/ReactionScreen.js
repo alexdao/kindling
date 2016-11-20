@@ -33,7 +33,7 @@ export class ReactionScreen extends React.Component {
           key={index + "-reaction-option"}
           className={index == this.state.selectedReactionIndex ? "reaction-option selected" : "reaction-option"}
           onClick={this.selectReaction.bind(this, index)}>
-          <img className="reaction-option-icon" src={"assets/" + Reactions.reactionIcons[reaction] + "_emoji.png"}/>
+          <img className="reaction-option-icon" src={"assets/" + Reactions.reactionIcons[reaction.toLowerCase()] + "_emoji.png"}/>
           <div className="reaction-option-label">
             {reaction}
           </div>

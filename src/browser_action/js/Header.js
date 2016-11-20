@@ -9,21 +9,16 @@ export class Header extends React.Component {
     }
   }
 
-  retrieveArticleTitle() {
-    return "What Happened on Election Day";
-  }
-
   retrieveArticlePublisher() {
     return "NYTimes";
   }
 
   render() {
-    let articleTitle = this.retrieveArticleTitle();
     let articlePublisher = this.retrieveArticlePublisher();
     return (
       <div className="header">
         <div className="header-article-title">
-          {articleTitle}
+          {this.props.title}
         </div>
         <div className="header-subtitle">
           {articlePublisher.toUpperCase()}

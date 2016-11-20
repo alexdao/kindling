@@ -1,37 +1,9 @@
 const React = require('react');
 const Reactions = require('./Reactions');
-const socket = io('https://frozen-waters-93748.herokuapp.com/');
 
 export class Messages extends React.Component {
   constructor(props) {
     super(props);
-
-    socket.on('msg', function(msg){
-      let msg_formatted = JSON.parse(msg);
-      let text = msg_formatted.msg;
-      let name = msg_formatted.name;
-      console.log('text: ' + text);
-      console.log('name: ' + name);
-
-      let messagesList = this.state.messages;
-      messagesList.push({
-        body: text,
-        sender: {
-          name: name,
-          reaction: "Approve"
-        },
-        self: false
-      });
-      this.setState({
-        messages: messagesList,
-        sending: false,
-        composerValue: ''
-      }, () => {
-        document.getElementById("composer").disabled = false;
-        const container = document.getElementById('messages-container');
-        container.scrollTop = container.scrollHeight;
-      });
-    });
 
     this.state = {
       messages: this.retrieveMessages(),
@@ -41,38 +13,57 @@ export class Messages extends React.Component {
     }
   }
 
+  handleMessageReceive(msg) {
+    console.log('received message?');
+    let msg_formatted = JSON.parse(msg);
+    console.log('msg', msg_formatted);
+    let text = msg_formatted.msg;
+    let name = msg_formatted.name;
+
+    let messagesList = this.state.messages;
+    messagesList.push({
+      body: text,
+      sender: {
+        name: name,
+        reaction: msg_formatted.reaction
+      },
+      self: false
+    });
+    this.setState({
+      messages: messagesList,
+      sending: false,
+      composerValue: msg_formatted.myself == false ? this.state.composerValue : ''
+    }, () => {
+      document.getElementById("composer").disabled = false;
+      const container = document.getElementById('messages-container');
+      container.scrollTop = container.scrollHeight;
+    });
+  }
+
   componentDidMount() {
     const container = document.getElementById('messages-container');
     container.scrollTop = container.scrollHeight;
   }
 
+  componentWillUpdate(nextProps, nextState) {
+    let handler = this.handleMessageReceive.bind(this);
+    if (nextProps == this.props && nextState != this.state) {
+      return;
+    }
+    console.log(nextProps);
+    let socket = nextProps.socket;
+    if (socket == null) {
+      console.log('error1');
+      return;
+    }
+    socket.on('msg', (msg) => {
+      console.log('handler?');
+      handler(msg);
+    });
+  }
+
   retrieveMessages() {
-    return [
-      {
-        body: "Hey!",
-        sender: {
-          name: "Kevin",
-          reaction: Reactions.reactions[0]
-        },
-        self: true
-      },
-      {
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-        sender: {
-          name: "Alex",
-          reaction: Reactions.reactions[1]
-        },
-        self: false
-      },
-      {
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-        sender: {
-          name: "Danny",
-          reaction: Reactions.reactions[2]
-        },
-        self: false
-      }
-    ];
+    return [];
   }
 
   handleMessageChange(event) {
@@ -95,7 +86,7 @@ export class Messages extends React.Component {
             <div className="message-sender-reaction">
               <img
                 src={
-                  "assets/" + Reactions.reactionIcons[message.sender.reaction] + '_emoji.png'
+                  "assets/" + Reactions.reactionIcons[message.sender.reaction.toLowerCase()] + '_emoji.png'
                 }
                 className="message-sender-reaction-icon"/>
             </div>
@@ -131,6 +122,11 @@ export class Messages extends React.Component {
       let msgRequest = {
         chatId: 0,
         text: this.state.composerValue
+      }
+      let socket = this.props.socket;
+      if (socket == null) {
+        console.log('error2');
+        return;
       }
       socket.emit('chat msg', JSON.stringify(msgRequest));
 

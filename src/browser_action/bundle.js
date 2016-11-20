@@ -20277,21 +20277,36 @@ var App = exports.App = function (_React$Component) {
     _this.state = {
       name: '',
       reaction: '',
-      initialized: false
+      initialized: false,
+      socket: null
     };
     return _this;
   }
 
   _createClass(App, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      chrome.tabs.getSelected(null, function (tab) {
+        console.log(tab);
+        _this2.setState({
+          uri: tab.url,
+          title: tab.title
+        });
+      });
+    }
+  }, {
     key: 'setUserInfo',
     value: function setUserInfo(info) {
       console.log('info set:', info);
       var socket = io('https://frozen-waters-93748.herokuapp.com/');
+      console.log('set');
       var payload = {
-        uri: 'uri',
-        name: 'Kevin',
-        reaction: 'Approve',
-        title: 'title',
+        uri: this.state.uri,
+        name: info.name,
+        reaction: info.reaction,
+        title: this.state.title,
         topic: 'topic',
         bias: 'liberal'
       };
@@ -20299,7 +20314,8 @@ var App = exports.App = function (_React$Component) {
       this.setState({
         name: info.name,
         reaction: info.reaction,
-        initialized: true
+        initialized: true,
+        socket: socket
       });
     }
   }, {
@@ -20309,10 +20325,12 @@ var App = exports.App = function (_React$Component) {
         'div',
         null,
         React.createElement(Sidebar, null),
-        React.createElement(Header, null),
+        React.createElement(Header, { title: this.state.title }),
         React.createElement(Messages, {
           myName: this.state.name,
-          myReaction: this.state.reaction }),
+          myReaction: this.state.reaction,
+          socket: this.state.socket,
+          title: this.state.title }),
         React.createElement(
           'div',
           { className: !this.state.initialized ? "reaction-screen" : "reaction-screen hidden" },
@@ -20359,11 +20377,6 @@ var Header = exports.Header = function (_React$Component) {
   }
 
   _createClass(Header, [{
-    key: "retrieveArticleTitle",
-    value: function retrieveArticleTitle() {
-      return "What Happened on Election Day";
-    }
-  }, {
     key: "retrieveArticlePublisher",
     value: function retrieveArticlePublisher() {
       return "NYTimes";
@@ -20371,7 +20384,6 @@ var Header = exports.Header = function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      var articleTitle = this.retrieveArticleTitle();
       var articlePublisher = this.retrieveArticlePublisher();
       return React.createElement(
         "div",
@@ -20379,7 +20391,7 @@ var Header = exports.Header = function (_React$Component) {
         React.createElement(
           "div",
           { className: "header-article-title" },
-          articleTitle
+          this.props.title
         ),
         React.createElement(
           "div",
@@ -20414,7 +20426,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var React = require('react');
 var Reactions = require('./Reactions');
-var socket = io('https://frozen-waters-93748.herokuapp.com/');
 
 var Messages = exports.Messages = function (_React$Component) {
   _inherits(Messages, _React$Component);
@@ -20423,33 +20434,6 @@ var Messages = exports.Messages = function (_React$Component) {
     _classCallCheck(this, Messages);
 
     var _this = _possibleConstructorReturn(this, (Messages.__proto__ || Object.getPrototypeOf(Messages)).call(this, props));
-
-    socket.on('msg', function (msg) {
-      var msg_formatted = JSON.parse(msg);
-      var text = msg_formatted.msg;
-      var name = msg_formatted.name;
-      console.log('text: ' + text);
-      console.log('name: ' + name);
-
-      var messagesList = this.state.messages;
-      messagesList.push({
-        body: text,
-        sender: {
-          name: name,
-          reaction: "Approve"
-        },
-        self: false
-      });
-      this.setState({
-        messages: messagesList,
-        sending: false,
-        composerValue: ''
-      }, function () {
-        document.getElementById("composer").disabled = false;
-        var container = document.getElementById('messages-container');
-        container.scrollTop = container.scrollHeight;
-      });
-    });
 
     _this.state = {
       messages: _this.retrieveMessages(),
@@ -20461,36 +20445,61 @@ var Messages = exports.Messages = function (_React$Component) {
   }
 
   _createClass(Messages, [{
+    key: 'handleMessageReceive',
+    value: function handleMessageReceive(msg) {
+      console.log('received message?');
+      var msg_formatted = JSON.parse(msg);
+      console.log('msg', msg_formatted);
+      var text = msg_formatted.msg;
+      var name = msg_formatted.name;
+
+      var messagesList = this.state.messages;
+      messagesList.push({
+        body: text,
+        sender: {
+          name: name,
+          reaction: msg_formatted.reaction
+        },
+        self: false
+      });
+      this.setState({
+        messages: messagesList,
+        sending: false,
+        composerValue: msg_formatted.myself == false ? this.state.composerValue : ''
+      }, function () {
+        document.getElementById("composer").disabled = false;
+        var container = document.getElementById('messages-container');
+        container.scrollTop = container.scrollHeight;
+      });
+    }
+  }, {
     key: 'componentDidMount',
     value: function componentDidMount() {
       var container = document.getElementById('messages-container');
       container.scrollTop = container.scrollHeight;
     }
   }, {
+    key: 'componentWillUpdate',
+    value: function componentWillUpdate(nextProps, nextState) {
+      var handler = this.handleMessageReceive.bind(this);
+      if (nextProps == this.props && nextState != this.state) {
+        return;
+      }
+      console.log(nextProps);
+      var socket = nextProps.socket;
+      if (socket == null) {
+        console.log('error1');
+        return;
+      }
+      socket.on('msg', function (msg) {
+        console.log('handler?');
+        handler(msg);
+      });
+    }
+  }, {
     key: 'retrieveMessages',
     value: function retrieveMessages() {
-      return [{
-        body: "Hey!",
-        sender: {
-          name: "Kevin",
-          reaction: Reactions.reactions[0]
-        },
-        self: true
-      }, {
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-        sender: {
-          name: "Alex",
-          reaction: Reactions.reactions[1]
-        },
-        self: false
-      }, {
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-        sender: {
-          name: "Danny",
-          reaction: Reactions.reactions[2]
-        },
-        self: false
-      }];
+      return [];
     }
   }, {
     key: 'handleMessageChange',
@@ -20523,7 +20532,7 @@ var Messages = exports.Messages = function (_React$Component) {
               'div',
               { className: 'message-sender-reaction' },
               React.createElement('img', {
-                src: "assets/" + Reactions.reactionIcons[message.sender.reaction] + '_emoji.png',
+                src: "assets/" + Reactions.reactionIcons[message.sender.reaction.toLowerCase()] + '_emoji.png',
                 className: 'message-sender-reaction-icon' })
             )
           ),
@@ -20560,6 +20569,11 @@ var Messages = exports.Messages = function (_React$Component) {
           chatId: 0,
           text: this.state.composerValue
         };
+        var socket = this.props.socket;
+        if (socket == null) {
+          console.log('error2');
+          return;
+        }
         socket.emit('chat msg', JSON.stringify(msgRequest));
 
         // setTimeout(() => {
@@ -20716,7 +20730,7 @@ var ReactionScreen = exports.ReactionScreen = function (_React$Component) {
             key: index + "-reaction-option",
             className: index == _this2.state.selectedReactionIndex ? "reaction-option selected" : "reaction-option",
             onClick: _this2.selectReaction.bind(_this2, index) },
-          React.createElement('img', { className: 'reaction-option-icon', src: "assets/" + Reactions.reactionIcons[reaction] + "_emoji.png" }),
+          React.createElement('img', { className: 'reaction-option-icon', src: "assets/" + Reactions.reactionIcons[reaction.toLowerCase()] + "_emoji.png" }),
           React.createElement(
             'div',
             { className: 'reaction-option-label' },
@@ -20826,9 +20840,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 var ReactionIcons = exports.ReactionIcons = {
-  "Approve": "smiling",
-  "Neutral": "indifferent",
-  "Disapprove": "angry"
+  "approve": "smiling",
+  "neutral": "indifferent",
+  "disapprove": "angry"
 };
 
 var Reactions = exports.Reactions = ["Approve", "Neutral", "Disapprove"];

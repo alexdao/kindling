@@ -11,18 +11,30 @@ export class App extends React.Component {
     this.state = {
       name: '',
       reaction: '',
-      initialized: false
+      initialized: false,
+      socket: null
     }
+  }
+
+  componentDidMount() {
+    chrome.tabs.getSelected(null, (tab) => {
+      console.log(tab);
+      this.setState({
+        uri: tab.url,
+        title: tab.title
+      });
+    });
   }
 
   setUserInfo(info) {
     console.log('info set:', info);
     let socket = io('https://frozen-waters-93748.herokuapp.com/');
+    console.log('set');
     let payload = {
-      uri: 'uri',
-      name: 'Kevin',
-      reaction: 'Approve',
-      title: 'title',
+      uri: this.state.uri,
+      name: info.name,
+      reaction: info.reaction,
+      title: this.state.title,
       topic: 'topic',
       bias: 'liberal'
     }
@@ -30,7 +42,8 @@ export class App extends React.Component {
     this.setState({
       name: info.name,
       reaction: info.reaction,
-      initialized: true
+      initialized: true,
+      socket: socket
     });
   }
 
@@ -38,10 +51,12 @@ export class App extends React.Component {
     return (
       <div>
         <Sidebar/>
-        <Header/>
+        <Header title={this.state.title}/>
         <Messages
           myName={this.state.name}
-          myReaction={this.state.reaction}/>
+          myReaction={this.state.reaction}
+          socket={this.state.socket}
+          title={this.state.title}/>
         <div className={!this.state.initialized ? "reaction-screen" : "reaction-screen hidden"}>
           <ReactionScreen setUserInfo={this.setUserInfo.bind(this)}/>
         </div>

@@ -1,7 +1,7 @@
 export const ReactionIcons = {
-  "Approve": "smiling",
-  "Neutral": "indifferent",
-  "Disapprove": "angry"
+  "approve": "smiling",
+  "neutral": "indifferent",
+  "disapprove": "angry"
 }
 
 export const Reactions = ["Approve", "Neutral", "Disapprove"];

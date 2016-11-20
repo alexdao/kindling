@@ -21,8 +21,6 @@
   },
   "permissions": [
     "contentSettings",
-    "history",
-    "notifications",
-    "geolocation"
+    "activeTab"
   ]
 }
