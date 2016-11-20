@@ -165,12 +165,13 @@ body {
 
 .message-body.other {
   background-color: lightgray;
-  color: white;
+  color: black;
 }
 
 .message-body.self {
   background-color: var(--bubble-color);
-  color: black
+  color: white;
+
 }
 
 .message-composer {
