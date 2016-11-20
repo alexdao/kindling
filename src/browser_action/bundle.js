@@ -20512,7 +20512,7 @@ var Messages = exports.Messages = function (_React$Component) {
       var name = msg_formatted.name;
 
       var chatsToMessages = this.state.chatsToMessages;
-      var messagesList = chatsToMessages[this.props.currentChatId];
+      var messagesList = chatsToMessages[msg_formatted.chatId];
       if (messagesList == null) {
         messagesList = [];
       }
@@ -20525,7 +20525,7 @@ var Messages = exports.Messages = function (_React$Component) {
         self: msg_formatted.myself
       });
 
-      chatsToMessages[this.props.currentChatId] = messagesList;
+      chatsToMessages[msg_formatted.chatId] = messagesList;
       this.setState({
         chatsToMessages: chatsToMessages,
         sending: false,

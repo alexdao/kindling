@@ -21,7 +21,7 @@ export class Messages extends React.Component {
     let name = msg_formatted.name;
 
     let chatsToMessages = this.state.chatsToMessages;
-    let messagesList = chatsToMessages[this.props.currentChatId];
+    let messagesList = chatsToMessages[msg_formatted.chatId];
     if (messagesList == null) {
       messagesList = [];
     }
@@ -34,7 +34,7 @@ export class Messages extends React.Component {
       self: msg_formatted.myself
     });
 
-    chatsToMessages[this.props.currentChatId] = messagesList;
+    chatsToMessages[msg_formatted.chatId] = messagesList;
     this.setState({
       chatsToMessages: chatsToMessages,
       sending: false,
