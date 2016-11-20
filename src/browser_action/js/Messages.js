@@ -53,7 +53,7 @@ export class Messages extends React.Component {
 
   componentWillUpdate(nextProps, nextState) {
     let handler = this.handleMessageReceive.bind(this);
-    if (nextProps == this.props && nextState != this.state) {
+    if (nextProps.socket == this.props.socket && nextState != this.state) {
       return;
     }
     console.log(nextProps);

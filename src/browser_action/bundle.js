@@ -20546,7 +20546,7 @@ var Messages = exports.Messages = function (_React$Component) {
     key: 'componentWillUpdate',
     value: function componentWillUpdate(nextProps, nextState) {
       var handler = this.handleMessageReceive.bind(this);
-      if (nextProps == this.props && nextState != this.state) {
+      if (nextProps.socket == this.props.socket && nextState != this.state) {
         return;
       }
       console.log(nextProps);
