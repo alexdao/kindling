@@ -11,6 +11,7 @@ export class Messages extends React.Component {
       composerValue: '',
       chatsToMessages: {},
       initialized: false,
+      disconnected: false
     }
   }
 
@@ -69,6 +70,10 @@ export class Messages extends React.Component {
 
     socket.on('disconnect_client', (payload) => {
       console.log('someone disconnected', payload);
+      document.getElementById("composer").disabled = true;
+      this.setState({
+        disconnected: true
+      });
     });
     nextState.initialized = true;
   }
@@ -148,7 +153,7 @@ export class Messages extends React.Component {
 
   render() {
     let sendButtonClass = "message-composer-send unselectable";
-    if (this.state.composerValue.length == 0) {
+    if (this.state.composerValue.length == 0 || this.state.disconnected) {
       sendButtonClass += " disabled";
     } else if (this.state.sendPressed) {
       sendButtonClass += " pressed";
@@ -159,6 +164,20 @@ export class Messages extends React.Component {
       <div className="messages">
         <div id="messages-container" className="messages-container">
           {this.renderMessages()}
+          <div className={this.state.disconnected ? "disconnected-message" : "disconnected-message hidden"}>
+            <div>THE OTHER USER HAS DISCONNECTED.</div>
+            <div
+              className="ok-button"
+              onClick={() => {
+                document.getElementById("composer").disabled = false;
+                this.setState({
+                  disconnected: false
+                });
+                this.props.disconnectChat(this.props.currentChatIndex)
+              }}>
+              OK
+            </div>
+          </div>
         </div>
         <div className="message-composer unselectable">
           <form onSubmit={(e) => {

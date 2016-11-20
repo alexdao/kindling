@@ -306,6 +306,41 @@ body {
   height: 380px;
   overflow: auto;
   width: 340px;
+  position: relative;
+}
+
+.disconnected-message {
+  font-size: 12px;
+  width: 100%;
+  height: 40px;
+  text-align: center;
+  color: gray;
+  background-color: lightgray;
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.disconnected-message.hidden {
+  display: none;
+}
+
+.ok-button {
+  color: white;
+  background-color: var(--send-button-color);
+  width: 30px;
+  height: 15px;
+  padding: 5px;
+  margin-left: 10px;
+  border-radius: 5px;
+  border: 1px solid white;
+  cursor: pointer;
+}
+
+.ok-button:hover {
+  box-shadow: 0 0 2px white;
 }
 
 ::-webkit-scrollbar {

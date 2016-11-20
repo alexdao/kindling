@@ -20564,7 +20564,8 @@ var Messages = exports.Messages = function (_React$Component) {
       sending: false,
       composerValue: '',
       chatsToMessages: {},
-      initialized: false
+      initialized: false,
+      disconnected: false
     };
     return _this;
   }
@@ -20612,6 +20613,8 @@ var Messages = exports.Messages = function (_React$Component) {
   }, {
     key: 'componentWillUpdate',
     value: function componentWillUpdate(nextProps, nextState) {
+      var _this2 = this;
+
       var handler = this.handleMessageReceive.bind(this);
       if (this.state.initialized) {
         return;
@@ -20628,6 +20631,10 @@ var Messages = exports.Messages = function (_React$Component) {
 
       socket.on('disconnect_client', function (payload) {
         console.log('someone disconnected', payload);
+        document.getElementById("composer").disabled = true;
+        _this2.setState({
+          disconnected: true
+        });
       });
       nextState.initialized = true;
     }
@@ -20717,10 +20724,10 @@ var Messages = exports.Messages = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this2 = this;
+      var _this3 = this;
 
       var sendButtonClass = "message-composer-send unselectable";
-      if (this.state.composerValue.length == 0) {
+      if (this.state.composerValue.length == 0 || this.state.disconnected) {
         sendButtonClass += " disabled";
       } else if (this.state.sendPressed) {
         sendButtonClass += " pressed";
@@ -20733,7 +20740,29 @@ var Messages = exports.Messages = function (_React$Component) {
         React.createElement(
           'div',
           { id: 'messages-container', className: 'messages-container' },
-          this.renderMessages()
+          this.renderMessages(),
+          React.createElement(
+            'div',
+            { className: this.state.disconnected ? "disconnected-message" : "disconnected-message hidden" },
+            React.createElement(
+              'div',
+              null,
+              'THE OTHER USER HAS DISCONNECTED.'
+            ),
+            React.createElement(
+              'div',
+              {
+                className: 'ok-button',
+                onClick: function onClick() {
+                  document.getElementById("composer").disabled = false;
+                  _this3.setState({
+                    disconnected: false
+                  });
+                  _this3.props.disconnectChat(_this3.props.currentChatIndex);
+                } },
+              'OK'
+            )
+          )
         ),
         React.createElement(
           'div',
@@ -20742,7 +20771,7 @@ var Messages = exports.Messages = function (_React$Component) {
             'form',
             { onSubmit: function onSubmit(e) {
                 e.preventDefault();
-                _this2.sendReleased(e, true);
+                _this3.sendReleased(e, true);
               } },
             React.createElement('input', {
               type: 'text',
