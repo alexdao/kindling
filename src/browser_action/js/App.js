@@ -1,4 +1,7 @@
 const React = require('react');
+const Sidebar = require('./Sidebar');
+const Header = require('./Header');
+const Messages = require('./Messages');
 
 export class App extends React.Component {
   constructor(props) {
@@ -7,7 +10,11 @@ export class App extends React.Component {
 
   render() {
     return (
-      <div>Hello Kindlers</div>
+      <div>
+        <Sidebar/>
+        <Header/>
+        <Messages/>
+      </div>
     );
   }
 }
