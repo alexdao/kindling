@@ -100,8 +100,8 @@ body {
 .reaction-option {
   cursor: pointer;
   border-radius: 80px;
-  width: 64px;
-  height: 64px;
+  width: 70px;
+  height: 70px;
   border: 4px solid transparent;
   margin-left: 20px;
   position: relative;
@@ -112,7 +112,7 @@ body {
 }
 
 .reaction-option:hover {
-  border-color: white;
+  border-color: lightgray;
 }
 
 .reaction-option.selected {
@@ -123,20 +123,21 @@ body {
   width: 80px;
   height: 80px;
   position: absolute;
-  top: -10px;
-  left: -8px;
+  top: -7px;
+  left: -5px;
 }
 
 .reaction-option-label {
   font-size: 14px;
-  color: black;
+  color: gray;
   text-align: center;
   margin-top: 75px;
 }
 
 .reaction-option.selected .reaction-option-label {
+  color: black;
   font-size: 16px;
-  margin-left: -4px;
+  margin-left: -2px;
 }
 
 .done-button {
