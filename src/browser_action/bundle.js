@@ -20637,10 +20637,7 @@ var Messages = exports.Messages = function (_React$Component) {
           disconnectedUsers: disconnectedUsers
         });
       });
-      if (nextProps.currentChatId != this.props.currentChatId) {
-        var disconnectedUsers = this.state.disconnectedUsers;
-        document.getElementById("composer").disabled = this.state.disconnectedUsers.indexOf(nextProps.currentChatId) != -1;
-      }
+
       nextState.initialized = true;
     }
   }, {

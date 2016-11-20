@@ -77,10 +77,7 @@ export class Messages extends React.Component {
         disconnectedUsers: disconnectedUsers
       });
     });
-    if (nextProps.currentChatId != this.props.currentChatId) {
-      let disconnectedUsers = this.state.disconnectedUsers;
-      document.getElementById("composer").disabled = this.state.disconnectedUsers.indexOf(nextProps.currentChatId) != -1
-    }
+
     nextState.initialized = true;
   }
 
