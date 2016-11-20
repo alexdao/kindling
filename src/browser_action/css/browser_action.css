@@ -262,11 +262,32 @@ body {
 .header-private-chat {
   flex-direction: column;
   display: flex;
+  align-items: center;
+}
+
+.header-private-chat-title {
+  font-size: 14px;
+  text-align: center;
+  color: gray;
+  margin-top: 10px;
+}
+
+.header-private-chat-user {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .header-private-chat-user-reaction-icon {
   width: 30px;
   height: 30px;
+}
+
+.header-private-chat-user-name {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  margin-left: 10px;
 }
 
 /* MESSAGES */

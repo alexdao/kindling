@@ -20472,10 +20472,12 @@ var Header = exports.Header = function (_React$Component) {
     key: 'render',
     value: function render() {
       var articlePublisher = this.retrieveArticlePublisher();
+      console.log(this.props.currentChatIndex);
+      console.log(this.props.chatUsers);
       return React.createElement(
         'div',
         { className: 'header' },
-        this.props.currentChatIndex == this.props.chats[0] || this.props.currentChatIndex == -1 ? React.createElement(
+        this.props.currentChatIndex == 0 || this.props.currentChatIndex == -1 ? React.createElement(
           'div',
           null,
           React.createElement(
@@ -20505,13 +20507,13 @@ var Header = exports.Header = function (_React$Component) {
               'div',
               { className: 'header-private-chat-user-reaction' },
               React.createElement('img', {
-                src: "assets/" + Reactions.reactionIcons[this.props.chats[this.props.currentChatIndex].reaction.toLowerCase()] + '_emoji.png',
+                src: "assets/" + Reactions.reactionIcons[this.props.chatUsers[this.props.currentChatIndex - 1].reaction.toLowerCase()] + '_emoji.png',
                 className: 'header-private-chat-user-reaction-icon' })
             ),
             React.createElement(
               'div',
               { className: 'header-private-chat-user-name' },
-              this.props.chats[this.props.currentChatIndex].name
+              this.props.chatUsers[this.props.currentChatIndex - 1].name
             )
           )
         )

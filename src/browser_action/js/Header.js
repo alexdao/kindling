@@ -25,10 +25,12 @@ export class Header extends React.Component {
 
   render() {
     let articlePublisher = this.retrieveArticlePublisher();
+    console.log(this.props.currentChatIndex);
+    console.log(this.props.chatUsers);
     return (
       <div className="header">
         {
-          this.props.currentChatIndex == this.props.chats[0] || this.props.currentChatIndex == -1
+          this.props.currentChatIndex == 0 || this.props.currentChatIndex == -1
           ? (
             <div>
               <div className="header-article-title">
@@ -50,12 +52,12 @@ export class Header extends React.Component {
                 <div className="header-private-chat-user-reaction">
                     <img
                       src={
-                        "assets/" + Reactions.reactionIcons[this.props.chats[this.props.currentChatIndex].reaction.toLowerCase()] + '_emoji.png'
+                        "assets/" + Reactions.reactionIcons[this.props.chatUsers[this.props.currentChatIndex - 1].reaction.toLowerCase()] + '_emoji.png'
                       }
                       className="header-private-chat-user-reaction-icon"/>
                 </div>
                 <div className="header-private-chat-user-name">
-                  {this.props.chats[this.props.currentChatIndex].name}
+                  {this.props.chatUsers[this.props.currentChatIndex - 1].name}
                 </div>
               </div>
             </div>
