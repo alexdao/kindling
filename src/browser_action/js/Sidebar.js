@@ -9,23 +9,6 @@ export class Sidebar extends React.Component {
     }
   }
 
-  retrievePersonalConversations() {
-    return [
-      {
-        name: "Kevin"
-      },
-      {
-        name: "Danny"
-      },
-      {
-        name: "Alex"
-      },
-      {
-        name: "Jiawei"
-      }
-    ]
-  }
-
   enterTab(index) {
     this.setState({
       hovered: index
@@ -39,7 +22,6 @@ export class Sidebar extends React.Component {
   }
 
   renderChatTabs() {
-    // let tabs = this.retrievePersonalConversations();
     let tabElements = [];
     this.props.chatUsers.forEach((tab, index) => {
       let tabElement = (
@@ -66,7 +48,6 @@ export class Sidebar extends React.Component {
   }
 
   renderChatTabLabels() {
-    // let tabs = this.retrievePersonalConversations();
     let labelElements = [];
     this.props.chatUsers.forEach((tab, index) => {
       let labelElement = (

@@ -20384,7 +20384,7 @@ var App = exports.App = function (_React$Component) {
     value: function disconnectChat(index) {
       var chats = this.state.chats;
       var chatUsers = this.state.chatUsers;
-      chats.splice(index - 1, 1);
+      chats.splice(index, 1);
       chatUsers.splice(index - 1, 1);
       this.setState({
         currentChatIndex: 0,
@@ -20480,8 +20480,6 @@ var Header = exports.Header = function (_React$Component) {
     key: 'render',
     value: function render() {
       var articlePublisher = this.retrieveArticlePublisher();
-      console.log(this.props.currentChatIndex);
-      console.log(this.props.chatUsers);
       return React.createElement(
         'div',
         { className: 'header' },
@@ -20566,7 +20564,7 @@ var Messages = exports.Messages = function (_React$Component) {
       composerValue: '',
       chatsToMessages: {},
       initialized: false,
-      disconnected: false
+      disconnectedUsers: []
     };
     return _this;
   }
@@ -20633,8 +20631,10 @@ var Messages = exports.Messages = function (_React$Component) {
       socket.on('disconnect_client', function (payload) {
         console.log('someone disconnected', payload);
         document.getElementById("composer").disabled = true;
+        var disconnectedUsers = _this2.state.disconnectedUsers;
+        disconnectedUsers.push(_this2.props.currentChatId);
         _this2.setState({
-          disconnected: true
+          disconnectedUsers: disconnectedUsers
         });
       });
       nextState.initialized = true;
@@ -20728,7 +20728,7 @@ var Messages = exports.Messages = function (_React$Component) {
       var _this3 = this;
 
       var sendButtonClass = "message-composer-send unselectable";
-      if (this.state.composerValue.length == 0 || this.state.disconnected) {
+      if (this.state.composerValue.length == 0 || this.state.disconnectedUsers.indexOf(this.props.currentChatId) != -1) {
         sendButtonClass += " disabled";
       } else if (this.state.sendPressed) {
         sendButtonClass += " pressed";
@@ -20744,7 +20744,7 @@ var Messages = exports.Messages = function (_React$Component) {
           this.renderMessages(),
           React.createElement(
             'div',
-            { className: this.state.disconnected ? "disconnected-message" : "disconnected-message hidden" },
+            { className: this.state.disconnectedUsers.indexOf(this.props.currentChatId) != -1 ? "disconnected-message" : "disconnected-message hidden" },
             React.createElement(
               'div',
               null,
@@ -20758,10 +20758,12 @@ var Messages = exports.Messages = function (_React$Component) {
                   document.getElementById("composer").disabled = false;
                   var chatsToMessages = _this3.state.chatsToMessages;
                   console.log(chatsToMessages);
-                  delete chatsToMessages[_this3.props.chats[_this3.props.currentChatIndex]];
+                  chatsToMessages[_this3.props.currentChatId] = [];
                   console.log(chatsToMessages);
+                  var disconnectedUsers = _this3.state.disconnectedUsers;
+                  disconnectedUsers.splice(disconnectedUsers.indexOf(_this3.props.currentChatId), 1);
                   _this3.setState({
-                    disconnected: false,
+                    disconnectedUsers: disconnectedUsers,
                     chatsToMessages: chatsToMessages
                   });
                   _this3.props.disconnectChat(_this3.props.currentChatIndex);
@@ -21042,19 +21044,6 @@ var Sidebar = exports.Sidebar = function (_React$Component) {
   }
 
   _createClass(Sidebar, [{
-    key: "retrievePersonalConversations",
-    value: function retrievePersonalConversations() {
-      return [{
-        name: "Kevin"
-      }, {
-        name: "Danny"
-      }, {
-        name: "Alex"
-      }, {
-        name: "Jiawei"
-      }];
-    }
-  }, {
     key: "enterTab",
     value: function enterTab(index) {
       this.setState({
@@ -21073,7 +21062,6 @@ var Sidebar = exports.Sidebar = function (_React$Component) {
     value: function renderChatTabs() {
       var _this2 = this;
 
-      // let tabs = this.retrievePersonalConversations();
       var tabElements = [];
       this.props.chatUsers.forEach(function (tab, index) {
         var tabElement = React.createElement(
@@ -21101,7 +21089,6 @@ var Sidebar = exports.Sidebar = function (_React$Component) {
     value: function renderChatTabLabels() {
       var _this3 = this;
 
-      // let tabs = this.retrievePersonalConversations();
       var labelElements = [];
       this.props.chatUsers.forEach(function (tab, index) {
         var labelElement = React.createElement(

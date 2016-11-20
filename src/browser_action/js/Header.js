@@ -21,8 +21,6 @@ export class Header extends React.Component {
 
   render() {
     let articlePublisher = this.retrieveArticlePublisher();
-    console.log(this.props.currentChatIndex);
-    console.log(this.props.chatUsers);
     return (
       <div className="header">
         {

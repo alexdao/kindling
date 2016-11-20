@@ -11,7 +11,7 @@ export class Messages extends React.Component {
       composerValue: '',
       chatsToMessages: {},
       initialized: false,
-      disconnected: false
+      disconnectedUsers: []
     }
   }
 
@@ -71,8 +71,10 @@ export class Messages extends React.Component {
     socket.on('disconnect_client', (payload) => {
       console.log('someone disconnected', payload);
       document.getElementById("composer").disabled = true;
+      let disconnectedUsers = this.state.disconnectedUsers;
+      disconnectedUsers.push(this.props.currentChatId);
       this.setState({
-        disconnected: true
+        disconnectedUsers: disconnectedUsers
       });
     });
     nextState.initialized = true;
@@ -153,7 +155,7 @@ export class Messages extends React.Component {
 
   render() {
     let sendButtonClass = "message-composer-send unselectable";
-    if (this.state.composerValue.length == 0 || this.state.disconnected) {
+    if (this.state.composerValue.length == 0 || this.state.disconnectedUsers.indexOf(this.props.currentChatId) != -1) {
       sendButtonClass += " disabled";
     } else if (this.state.sendPressed) {
       sendButtonClass += " pressed";
@@ -164,7 +166,7 @@ export class Messages extends React.Component {
       <div className="messages">
         <div id="messages-container" className="messages-container">
           {this.renderMessages()}
-          <div className={this.state.disconnected ? "disconnected-message" : "disconnected-message hidden"}>
+          <div className={this.state.disconnectedUsers.indexOf(this.props.currentChatId) != -1 ? "disconnected-message" : "disconnected-message hidden"}>
             <div>THE OTHER USER HAS DISCONNECTED.</div>
             <div
               className="ok-button"
@@ -172,10 +174,12 @@ export class Messages extends React.Component {
                 document.getElementById("composer").disabled = false;
                 let chatsToMessages = this.state.chatsToMessages;
                 console.log(chatsToMessages);
-                delete chatsToMessages[this.props.chats[this.props.currentChatIndex]];
+                chatsToMessages[this.props.currentChatId] = [];
                 console.log(chatsToMessages);
+                let disconnectedUsers = this.state.disconnectedUsers;
+                disconnectedUsers.splice(disconnectedUsers.indexOf(this.props.currentChatId), 1);
                 this.setState({
-                  disconnected: false,
+                  disconnectedUsers: disconnectedUsers,
                   chatsToMessages: chatsToMessages
                 });
                 this.props.disconnectChat(this.props.currentChatIndex)
