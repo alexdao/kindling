@@ -51,7 +51,10 @@ export class Sidebar extends React.Component {
             : "sidebar-chat-tab"
           }
           onMouseEnter={this.enterTab.bind(this, index + 1)}
-          onMouseLeave={this.leaveTab.bind(this)}>
+          onMouseLeave={this.leaveTab.bind(this)}
+          onClick={() => {
+            this.props.switchChat(index + 1);
+          }}>
           <div className="sidebar-chat-tab-text">
             {tab.name.charAt(0)}
           </div>
@@ -94,7 +97,10 @@ export class Sidebar extends React.Component {
               : "sidebar-chat-tab group"
             }
             onMouseEnter={this.enterTab.bind(this, 0)}
-            onMouseLeave={this.leaveTab.bind(this)}>
+            onMouseLeave={this.leaveTab.bind(this)}
+            onClick={() => {
+              this.props.switchChat(0);
+            }}>
             <div className="sidebar-chat-tab-text">
               <i className="fa fa-users" aria-hidden="true"></i>
             </div>

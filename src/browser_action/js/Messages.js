@@ -6,7 +6,6 @@ export class Messages extends React.Component {
     super(props);
 
     this.state = {
-      messages: this.retrieveMessages(),
       sendPressed: false,
       sending: false,
       composerValue: '',
@@ -21,7 +20,11 @@ export class Messages extends React.Component {
     let text = msg_formatted.msg;
     let name = msg_formatted.name;
 
-    let messagesList = this.state.messages;
+    let chatsToMessages = this.state.chatsToMessages;
+    let messagesList = chatsToMessages[this.props.currentChatId];
+    if (messagesList == null) {
+      messagesList = [];
+    }
     messagesList.push({
       body: text,
       sender: {
@@ -30,8 +33,10 @@ export class Messages extends React.Component {
       },
       self: msg_formatted.myself
     });
+
+    chatsToMessages[this.props.currentChatId] = messagesList;
     this.setState({
-      messages: messagesList,
+      chatsToMessages: chatsToMessages,
       sending: false,
       composerValue: msg_formatted.myself == false ? this.state.composerValue : ''
     }, () => {
@@ -63,10 +68,6 @@ export class Messages extends React.Component {
     });
   }
 
-  retrieveMessages() {
-    return [];
-  }
-
   handleMessageChange(event) {
     this.setState({
       composerValue: event.target.value
@@ -75,7 +76,10 @@ export class Messages extends React.Component {
 
   renderMessages() {
     let messageElements = [];
-    this.state.messages.forEach((message, index) => {
+    if (this.state.chatsToMessages[this.props.currentChatId] == null) {
+      return;
+    }
+    this.state.chatsToMessages[this.props.currentChatId].forEach((message, index) => {
       let messageElement = (
         <div key={index + "-message"} className="message-item">
           <div className="message-sender-info unselectable">
@@ -121,7 +125,7 @@ export class Messages extends React.Component {
       console.log("sending message:", this.state.composerValue);
       document.getElementById("composer").disabled = true;
       let msgRequest = {
-        chatId: this.props.chatId,
+        chatId: this.props.currentChatId,
         text: this.state.composerValue
       }
       let socket = this.props.socket;

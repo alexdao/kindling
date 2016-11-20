@@ -20363,7 +20363,8 @@ var App = exports.App = function (_React$Component) {
     key: 'switchChat',
     value: function switchChat(index) {
       this.setState({
-        currentChatIndex: index
+        currentChatIndex: index,
+        currentChatId: this.state.chats[index]
       });
     }
   }, {
@@ -20493,7 +20494,6 @@ var Messages = exports.Messages = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (Messages.__proto__ || Object.getPrototypeOf(Messages)).call(this, props));
 
     _this.state = {
-      messages: _this.retrieveMessages(),
       sendPressed: false,
       sending: false,
       composerValue: '',
@@ -20511,7 +20511,11 @@ var Messages = exports.Messages = function (_React$Component) {
       var text = msg_formatted.msg;
       var name = msg_formatted.name;
 
-      var messagesList = this.state.messages;
+      var chatsToMessages = this.state.chatsToMessages;
+      var messagesList = chatsToMessages[this.props.currentChatId];
+      if (messagesList == null) {
+        messagesList = [];
+      }
       messagesList.push({
         body: text,
         sender: {
@@ -20520,8 +20524,10 @@ var Messages = exports.Messages = function (_React$Component) {
         },
         self: msg_formatted.myself
       });
+
+      chatsToMessages[this.props.currentChatId] = messagesList;
       this.setState({
-        messages: messagesList,
+        chatsToMessages: chatsToMessages,
         sending: false,
         composerValue: msg_formatted.myself == false ? this.state.composerValue : ''
       }, function () {
@@ -20555,11 +20561,6 @@ var Messages = exports.Messages = function (_React$Component) {
       });
     }
   }, {
-    key: 'retrieveMessages',
-    value: function retrieveMessages() {
-      return [];
-    }
-  }, {
     key: 'handleMessageChange',
     value: function handleMessageChange(event) {
       this.setState({
@@ -20570,7 +20571,10 @@ var Messages = exports.Messages = function (_React$Component) {
     key: 'renderMessages',
     value: function renderMessages() {
       var messageElements = [];
-      this.state.messages.forEach(function (message, index) {
+      if (this.state.chatsToMessages[this.props.currentChatId] == null) {
+        return;
+      }
+      this.state.chatsToMessages[this.props.currentChatId].forEach(function (message, index) {
         var messageElement = React.createElement(
           'div',
           { key: index + "-message", className: 'message-item' },
@@ -20624,7 +20628,7 @@ var Messages = exports.Messages = function (_React$Component) {
         console.log("sending message:", this.state.composerValue);
         document.getElementById("composer").disabled = true;
         var msgRequest = {
-          chatId: this.props.chatId,
+          chatId: this.props.currentChatId,
           text: this.state.composerValue
         };
         var socket = this.props.socket;
@@ -20972,7 +20976,10 @@ var Sidebar = exports.Sidebar = function (_React$Component) {
             key: index + "-chat-tab",
             className: _this2.props.currentChatIndex == index + 1 ? "sidebar-chat-tab selected" : "sidebar-chat-tab",
             onMouseEnter: _this2.enterTab.bind(_this2, index + 1),
-            onMouseLeave: _this2.leaveTab.bind(_this2) },
+            onMouseLeave: _this2.leaveTab.bind(_this2),
+            onClick: function onClick() {
+              _this2.props.switchChat(index + 1);
+            } },
           React.createElement(
             "div",
             { className: "sidebar-chat-tab-text" },
@@ -21010,6 +21017,8 @@ var Sidebar = exports.Sidebar = function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
+      var _this4 = this;
+
       return React.createElement(
         "div",
         null,
@@ -21021,7 +21030,10 @@ var Sidebar = exports.Sidebar = function (_React$Component) {
             {
               className: this.props.currentChatIndex == 0 ? "sidebar-chat-tab group selected" : "sidebar-chat-tab group",
               onMouseEnter: this.enterTab.bind(this, 0),
-              onMouseLeave: this.leaveTab.bind(this) },
+              onMouseLeave: this.leaveTab.bind(this),
+              onClick: function onClick() {
+                _this4.props.switchChat(0);
+              } },
             React.createElement(
               "div",
               { className: "sidebar-chat-tab-text" },

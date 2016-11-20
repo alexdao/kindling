@@ -87,7 +87,8 @@ export class App extends React.Component {
 
   switchChat(index) {
     this.setState({
-      currentChatIndex: index
+      currentChatIndex: index,
+      currentChatId: this.state.chats[index]
     });
   }
 
