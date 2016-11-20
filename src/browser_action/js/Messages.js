@@ -9,7 +9,8 @@ export class Messages extends React.Component {
       messages: this.retrieveMessages(),
       sendPressed: false,
       sending: false,
-      composerValue: ''
+      composerValue: '',
+      chatsToMessages: {}
     }
   }
 
@@ -27,7 +28,7 @@ export class Messages extends React.Component {
         name: name,
         reaction: msg_formatted.reaction
       },
-      self: false
+      self: msg_formatted.myself
     });
     this.setState({
       messages: messagesList,
@@ -120,7 +121,7 @@ export class Messages extends React.Component {
       console.log("sending message:", this.state.composerValue);
       document.getElementById("composer").disabled = true;
       let msgRequest = {
-        chatId: 0,
+        chatId: this.props.chatId,
         text: this.state.composerValue
       }
       let socket = this.props.socket;
@@ -129,27 +130,6 @@ export class Messages extends React.Component {
         return;
       }
       socket.emit('chat msg', JSON.stringify(msgRequest));
-
-      // setTimeout(() => {
-      //   let messagesList = this.state.messages;
-      //   messagesList.push({
-      //     body: this.state.composerValue,
-      //     sender: {
-      //       name: "Kevin",
-      //       reaction: "Approve"
-      //     },
-      //     self: true
-      //   });
-      //   this.setState({
-      //     messages: messagesList,
-      //     sending: false,
-      //     composerValue: ''
-      //   }, () => {
-      //     document.getElementById("composer").disabled = false;
-      //     const container = document.getElementById('messages-container');
-      //     container.scrollTop = container.scrollHeight;
-      //   });
-      // }, 1000);
     }
     this.setState({
       sendPressed: false,

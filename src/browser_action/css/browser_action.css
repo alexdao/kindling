@@ -146,6 +146,7 @@ body {
   background-color: var(--send-button-color);
   text-align: center;
   width: 80px;
+  height: 16px;
   border: 1px solid lightgray;
   box-shadow: 0 0 1px black;
   border-radius: 5px;
@@ -161,6 +162,11 @@ body {
   background-color: gray;
   color: lightgray;
   box-shadow: none;
+}
+
+.retrieving-chat-id-spinner {
+  width: 16px;
+  height: 16px;
 }
 
 /* SIDEBAR */
@@ -188,6 +194,10 @@ body {
   cursor: pointer;
 }
 
+.sidebar-chat-tab.group {
+  margin-top: 14px;
+}
+
 .sidebar-chat-tab:hover {
   color: var(--theme-color);
   background-color: white;
@@ -207,6 +217,17 @@ body {
   width: 80px;
   font-size: 14px;
   z-index: 3;
+}
+
+.sidebar-chat-tab-label.create-chat {
+  width: 160px;
+}
+
+.sidebar-divider {
+  height: 1px;
+  width: 100%;
+  background-color: white;
+  margin-top: 14px;
 }
 
 /* HEADER */
@@ -391,7 +412,8 @@ body {
   box-shadow: none;
 }
 
-.message-composer-send.sending {
+.message-composer-send.sending,
+.done-button.retrieving {
   opacity: 0.5;
   color: lightgray;
   box-shadow: none;

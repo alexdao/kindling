@@ -20278,7 +20278,11 @@ var App = exports.App = function (_React$Component) {
       name: '',
       reaction: '',
       initialized: false,
-      socket: null
+      socket: null,
+      currentChatId: '',
+      currentChatIndex: -1,
+      chats: [],
+      chatUsers: []
     };
     return _this;
   }
@@ -20299,6 +20303,8 @@ var App = exports.App = function (_React$Component) {
   }, {
     key: 'setUserInfo',
     value: function setUserInfo(info) {
+      var _this3 = this;
+
       console.log('info set:', info);
       var socket = io('https://frozen-waters-93748.herokuapp.com/');
       console.log('set');
@@ -20311,11 +20317,37 @@ var App = exports.App = function (_React$Component) {
         bias: 'liberal'
       };
       socket.emit('init', JSON.stringify(payload));
+
+      socket.on('chatId', function (chatId) {
+        console.log('chatId', chatId);
+        var chats = _this3.state.chats;
+        chats.push(chatId.chatId);
+
+        _this3.setState({
+          name: info.name,
+          reaction: info.reaction,
+          initialized: true,
+          socket: socket,
+          currentChatIndex: 0,
+          currentChatId: chatId.chatId,
+          chats: chats
+        });
+      });
+      socket.on('privateChatResponse', function (payload) {
+        console.log(payload);
+      });
+    }
+  }, {
+    key: 'addChat',
+    value: function addChat() {
+      console.log('private');
+      this.state.socket.emit('private', null);
+    }
+  }, {
+    key: 'switchChat',
+    value: function switchChat(index) {
       this.setState({
-        name: info.name,
-        reaction: info.reaction,
-        initialized: true,
-        socket: socket
+        currentChatIndex: index
       });
     }
   }, {
@@ -20324,13 +20356,21 @@ var App = exports.App = function (_React$Component) {
       return React.createElement(
         'div',
         null,
-        React.createElement(Sidebar, null),
+        React.createElement(Sidebar, {
+          chats: this.state.chats,
+          chatUsers: this.state.chatUsers,
+          addChat: this.addChat.bind(this),
+          switchChat: this.switchChat.bind(this) }),
         React.createElement(Header, { title: this.state.title }),
         React.createElement(Messages, {
           myName: this.state.name,
           myReaction: this.state.reaction,
           socket: this.state.socket,
-          title: this.state.title }),
+          title: this.state.title,
+          currentChatId: this.state.currentChatId,
+          currentChatIndex: this.state.currentChatIndex,
+          chats: this.state.chats,
+          chatUsers: this.state.chatUsers }),
         React.createElement(
           'div',
           { className: !this.state.initialized ? "reaction-screen" : "reaction-screen hidden" },
@@ -20439,7 +20479,8 @@ var Messages = exports.Messages = function (_React$Component) {
       messages: _this.retrieveMessages(),
       sendPressed: false,
       sending: false,
-      composerValue: ''
+      composerValue: '',
+      chatsToMessages: {}
     };
     return _this;
   }
@@ -20460,7 +20501,7 @@ var Messages = exports.Messages = function (_React$Component) {
           name: name,
           reaction: msg_formatted.reaction
         },
-        self: false
+        self: msg_formatted.myself
       });
       this.setState({
         messages: messagesList,
@@ -20566,7 +20607,7 @@ var Messages = exports.Messages = function (_React$Component) {
         console.log("sending message:", this.state.composerValue);
         document.getElementById("composer").disabled = true;
         var msgRequest = {
-          chatId: 0,
+          chatId: this.props.chatId,
           text: this.state.composerValue
         };
         var socket = this.props.socket;
@@ -20575,27 +20616,6 @@ var Messages = exports.Messages = function (_React$Component) {
           return;
         }
         socket.emit('chat msg', JSON.stringify(msgRequest));
-
-        // setTimeout(() => {
-        //   let messagesList = this.state.messages;
-        //   messagesList.push({
-        //     body: this.state.composerValue,
-        //     sender: {
-        //       name: "Kevin",
-        //       reaction: "Approve"
-        //     },
-        //     self: true
-        //   });
-        //   this.setState({
-        //     messages: messagesList,
-        //     sending: false,
-        //     composerValue: ''
-        //   }, () => {
-        //     document.getElementById("composer").disabled = false;
-        //     const container = document.getElementById('messages-container');
-        //     container.scrollTop = container.scrollHeight;
-        //   });
-        // }, 1000);
       }
       this.setState({
         sendPressed: false,
@@ -20697,7 +20717,8 @@ var ReactionScreen = exports.ReactionScreen = function (_React$Component) {
     _this.state = {
       nameValue: '',
       selectedReactionIndex: -1,
-      donePressed: false
+      donePressed: false,
+      retrievingChatId: false
     };
     return _this;
   }
@@ -20712,6 +20733,9 @@ var ReactionScreen = exports.ReactionScreen = function (_React$Component) {
   }, {
     key: 'selectReaction',
     value: function selectReaction(index) {
+      if (this.state.retrievingChatId) {
+        return;
+      }
       this.setState({
         selectedReactionIndex: index == this.state.selectedReactionIndex ? -1 : index
       });
@@ -20754,7 +20778,7 @@ var ReactionScreen = exports.ReactionScreen = function (_React$Component) {
   }, {
     key: 'doneReleased',
     value: function doneReleased(done) {
-      if (this.state.nameValue.length == 0 || this.state.selectedReactionIndex == -1) {
+      if (!done && this.state.retrievingChatId || this.state.nameValue.length == 0 || this.state.selectedReactionIndex == -1) {
         return;
       }
       if (done) {
@@ -20764,7 +20788,8 @@ var ReactionScreen = exports.ReactionScreen = function (_React$Component) {
         });
       }
       this.setState({
-        donePressed: false
+        donePressed: false,
+        retrievingChatId: done
       });
     }
   }, {
@@ -20775,6 +20800,8 @@ var ReactionScreen = exports.ReactionScreen = function (_React$Component) {
         doneButtonClass += " disabled";
       } else if (this.state.donePressed) {
         doneButtonClass += " pressed";
+      } else if (this.state.retrievingChatId) {
+        doneButtonClass += " retrieving";
       }
 
       return React.createElement(
@@ -20822,7 +20849,11 @@ var ReactionScreen = exports.ReactionScreen = function (_React$Component) {
             onMouseDown: this.donePressed.bind(this),
             onMouseUp: this.doneReleased.bind(this, true),
             onMouseLeave: this.doneReleased.bind(this, false) },
-          'Done'
+          this.state.retrievingChatId ? React.createElement(
+            'div',
+            null,
+            React.createElement('img', { className: 'retrieving-chat-id-spinner', src: 'assets/spinner.gif' })
+          ) : "Done"
         )
       );
     }
@@ -20915,15 +20946,15 @@ var Sidebar = exports.Sidebar = function (_React$Component) {
     value: function renderChatTabs() {
       var _this2 = this;
 
-      var tabs = this.retrievePersonalConversations();
+      // let tabs = this.retrievePersonalConversations();
       var tabElements = [];
-      tabs.forEach(function (tab, index) {
+      this.props.chatUsers.forEach(function (tab, index) {
         var tabElement = React.createElement(
           "div",
           {
             key: index + "-chat-tab",
             className: "sidebar-chat-tab",
-            onMouseEnter: _this2.enterTab.bind(_this2, index),
+            onMouseEnter: _this2.enterTab.bind(_this2, index + 1),
             onMouseLeave: _this2.leaveTab.bind(_this2) },
           React.createElement(
             "div",
@@ -20940,9 +20971,9 @@ var Sidebar = exports.Sidebar = function (_React$Component) {
     value: function renderChatTabLabels() {
       var _this3 = this;
 
-      var tabs = this.retrievePersonalConversations();
+      // let tabs = this.retrievePersonalConversations();
       var labelElements = [];
-      tabs.forEach(function (tab, index) {
+      this.props.chatUsers.forEach(function (tab, index) {
         var labelElement = React.createElement(
           "div",
           {
@@ -20950,8 +20981,8 @@ var Sidebar = exports.Sidebar = function (_React$Component) {
             className: "sidebar-chat-tab-label",
             style: {
               left: "65px",
-              top: 24 + index * 62 + "px",
-              display: index == _this3.state.hovered ? "block" : "none"
+              top: 33 + (index + 1) * 62 + "px",
+              display: index + 1 == _this3.state.hovered ? "block" : "none"
             } },
           tab.name
         );
@@ -20968,12 +20999,60 @@ var Sidebar = exports.Sidebar = function (_React$Component) {
         React.createElement(
           "div",
           { className: "sidebar" },
-          this.renderChatTabs()
+          React.createElement(
+            "div",
+            {
+              className: "sidebar-chat-tab group",
+              onMouseEnter: this.enterTab.bind(this, 0),
+              onMouseLeave: this.leaveTab.bind(this) },
+            React.createElement(
+              "div",
+              { className: "sidebar-chat-tab-text" },
+              React.createElement("i", { className: "fa fa-users", "aria-hidden": "true" })
+            )
+          ),
+          React.createElement("div", { className: "sidebar-divider" }),
+          this.renderChatTabs(),
+          React.createElement(
+            "div",
+            {
+              className: "sidebar-chat-tab create-chat",
+              onMouseEnter: this.enterTab.bind(this, this.props.chatUsers.length + 1),
+              onMouseLeave: this.leaveTab.bind(this),
+              onClick: this.props.addChat },
+            React.createElement(
+              "div",
+              { className: "sidebar-chat-tab-text" },
+              React.createElement("i", { className: "fa fa-plus", "aria-hidden": "true" })
+            )
+          )
         ),
         React.createElement(
           "div",
           null,
-          this.renderChatTabLabels()
+          React.createElement(
+            "div",
+            {
+              className: "sidebar-chat-tab-label",
+              style: {
+                left: "65px",
+                top: "18px",
+                display: this.state.hovered == 0 ? "block" : "none"
+              } },
+            "All Readers"
+          ),
+          this.renderChatTabLabels(),
+          React.createElement(
+            "div",
+            {
+              className: "sidebar-chat-tab-label create-chat",
+              style: {
+                left: "65px",
+                top: 33 + (this.props.chatUsers.length + 1) * 62 + "px",
+                display: this.state.hovered == this.props.chatUsers.length + 1 ? "block" : "none"
+              } },
+            "Connect With Someone"
+          )
         )
       );
     }

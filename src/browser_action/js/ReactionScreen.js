@@ -8,7 +8,8 @@ export class ReactionScreen extends React.Component {
     this.state = {
       nameValue: '',
       selectedReactionIndex: -1,
-      donePressed: false
+      donePressed: false,
+      retrievingChatId: false
     }
   }
 
@@ -19,6 +20,9 @@ export class ReactionScreen extends React.Component {
   }
 
   selectReaction(index) {
+    if (this.state.retrievingChatId) {
+      return;
+    }
     this.setState({
       selectedReactionIndex: index == this.state.selectedReactionIndex ? -1 : index
     });
@@ -54,7 +58,7 @@ export class ReactionScreen extends React.Component {
   }
 
   doneReleased(done) {
-    if (this.state.nameValue.length == 0 || this.state.selectedReactionIndex == -1) {
+    if (!done && this.state.retrievingChatId || this.state.nameValue.length == 0 || this.state.selectedReactionIndex == -1) {
       return;
     }
     if (done) {
@@ -64,7 +68,8 @@ export class ReactionScreen extends React.Component {
       });
     }
     this.setState({
-      donePressed: false
+      donePressed: false,
+      retrievingChatId: done
     });
   }
 
@@ -74,6 +79,8 @@ export class ReactionScreen extends React.Component {
       doneButtonClass += " disabled";
     } else if (this.state.donePressed) {
       doneButtonClass += " pressed";
+    } else if (this.state.retrievingChatId) {
+      doneButtonClass += " retrieving";
     }
 
     return (
@@ -104,7 +111,15 @@ export class ReactionScreen extends React.Component {
           onMouseDown={this.donePressed.bind(this)}
           onMouseUp={this.doneReleased.bind(this, true)}
           onMouseLeave={this.doneReleased.bind(this, false)}>
-          Done
+          {
+            this.state.retrievingChatId
+            ? (
+              <div>
+                <img className="retrieving-chat-id-spinner" src="assets/spinner.gif"/>
+              </div>
+            )
+            : "Done"
+          }
         </div>
       </div>
     );
