@@ -20369,6 +20369,19 @@ var App = exports.App = function (_React$Component) {
       });
     }
   }, {
+    key: 'disconnectChat',
+    value: function disconnectChat(index) {
+      var chats = this.state.chats;
+      var chatUsers = this.state.chatUsers;
+      chats.splice(index, 1);
+      chatUsers.splice(index, 1);
+      this.setState({
+        currentChatIndex: 0,
+        chats: chats,
+        chatUsers: chatUsers
+      });
+    }
+  }, {
     key: 'render',
     value: function render() {
       return React.createElement(
@@ -20382,7 +20395,10 @@ var App = exports.App = function (_React$Component) {
           switchChat: this.switchChat.bind(this) }),
         React.createElement(Header, {
           title: this.state.title,
-          uri: this.state.uri }),
+          uri: this.state.uri,
+          chats: this.state.chats,
+          chatUsers: this.state.chatUsers,
+          currentChatIndex: this.state.currentChatIndex }),
         React.createElement(Messages, {
           myName: this.state.name,
           myReaction: this.state.reaction,
@@ -20391,7 +20407,8 @@ var App = exports.App = function (_React$Component) {
           currentChatId: this.state.currentChatId,
           currentChatIndex: this.state.currentChatIndex,
           chats: this.state.chats,
-          chatUsers: this.state.chatUsers }),
+          chatUsers: this.state.chatUsers,
+          disconnectChat: this.disconnectChat.bind(this) }),
         React.createElement(
           'div',
           { className: !this.state.initialized ? "reaction-screen" : "reaction-screen hidden" },
@@ -20422,6 +20439,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var React = require('react');
+var Reactions = require('./Reactions');
 
 var Header = exports.Header = function (_React$Component) {
   _inherits(Header, _React$Component);
@@ -20457,17 +20475,45 @@ var Header = exports.Header = function (_React$Component) {
       return React.createElement(
         'div',
         { className: 'header' },
-        React.createElement(
+        this.props.currentChatIndex == this.props.chats[0] || this.props.currentChatIndex == -1 ? React.createElement(
           'div',
-          { className: 'header-article-title' },
-          this.props.title
-        ),
-        React.createElement(
+          null,
+          React.createElement(
+            'div',
+            { className: 'header-article-title' },
+            this.props.title
+          ),
+          React.createElement(
+            'div',
+            { className: 'header-subtitle' },
+            articlePublisher.toUpperCase(),
+            '\xA0 \u2022 \xA0',
+            this.state.readers + " Readers"
+          )
+        ) : React.createElement(
           'div',
-          { className: 'header-subtitle' },
-          articlePublisher.toUpperCase(),
-          '\xA0 \u2022 \xA0',
-          this.state.readers + " Readers"
+          { className: 'header-private-chat' },
+          React.createElement(
+            'div',
+            { className: 'header-private-chat-title' },
+            'Chatting with...'
+          ),
+          React.createElement(
+            'div',
+            { className: 'header-private-chat-user' },
+            React.createElement(
+              'div',
+              { className: 'header-private-chat-user-reaction' },
+              React.createElement('img', {
+                src: "assets/" + Reactions.reactionIcons[this.props.chats[this.props.currentChatIndex].reaction.toLowerCase()] + '_emoji.png',
+                className: 'header-private-chat-user-reaction-icon' })
+            ),
+            React.createElement(
+              'div',
+              { className: 'header-private-chat-user-name' },
+              this.props.chats[this.props.currentChatIndex].name
+            )
+          )
         )
       );
     }
@@ -20478,7 +20524,7 @@ var Header = exports.Header = function (_React$Component) {
 
 module.exports = Header;
 
-},{"react":176}],179:[function(require,module,exports){
+},{"./Reactions":181,"react":176}],179:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

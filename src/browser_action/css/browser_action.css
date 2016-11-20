@@ -259,6 +259,16 @@ body {
   color: #7e7e7e;
 }
 
+.header-private-chat {
+  flex-direction: column;
+  display: flex;
+}
+
+.header-private-chat-user-reaction-icon {
+  width: 30px;
+  height: 30px;
+}
+
 /* MESSAGES */
 .messages {
   z-index: 1;

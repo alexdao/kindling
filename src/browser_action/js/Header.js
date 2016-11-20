@@ -1,4 +1,5 @@
 const React = require('react');
+const Reactions = require('./Reactions');
 
 export class Header extends React.Component {
   constructor(props) {
@@ -26,14 +27,40 @@ export class Header extends React.Component {
     let articlePublisher = this.retrieveArticlePublisher();
     return (
       <div className="header">
-        <div className="header-article-title">
-          {this.props.title}
-        </div>
-        <div className="header-subtitle">
-          {articlePublisher.toUpperCase()}
-          &nbsp; &bull; &nbsp;
-          {this.state.readers + " Readers"}
-        </div>
+        {
+          this.props.currentChatIndex == this.props.chats[0] || this.props.currentChatIndex == -1
+          ? (
+            <div>
+              <div className="header-article-title">
+                {this.props.title}
+              </div>
+              <div className="header-subtitle">
+                {articlePublisher.toUpperCase()}
+                &nbsp; &bull; &nbsp;
+                {this.state.readers + " Readers"}
+              </div>
+            </div>
+          )
+          : (
+            <div className="header-private-chat">
+              <div className="header-private-chat-title">
+                Chatting with...
+              </div>
+              <div className="header-private-chat-user">
+                <div className="header-private-chat-user-reaction">
+                    <img
+                      src={
+                        "assets/" + Reactions.reactionIcons[this.props.chats[this.props.currentChatIndex].reaction.toLowerCase()] + '_emoji.png'
+                      }
+                      className="header-private-chat-user-reaction-icon"/>
+                </div>
+                <div className="header-private-chat-user-name">
+                  {this.props.chats[this.props.currentChatIndex].name}
+                </div>
+              </div>
+            </div>
+          )
+        }
       </div>
     );
   }

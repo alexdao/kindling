@@ -93,6 +93,18 @@ export class App extends React.Component {
     });
   }
 
+  disconnectChat(index) {
+    let chats = this.state.chats;
+    let chatUsers = this.state.chatUsers;
+    chats.splice(index, 1);
+    chatUsers.splice(index, 1);
+    this.setState({
+      currentChatIndex: 0,
+      chats: chats,
+      chatUsers: chatUsers
+    });
+  }
+
   render() {
     return (
       <div>
@@ -104,7 +116,10 @@ export class App extends React.Component {
           switchChat={this.switchChat.bind(this)}/>
         <Header
           title={this.state.title}
-          uri={this.state.uri}/>
+          uri={this.state.uri}
+          chats={this.state.chats}
+          chatUsers={this.state.chatUsers}
+          currentChatIndex={this.state.currentChatIndex}/>
         <Messages
           myName={this.state.name}
           myReaction={this.state.reaction}
@@ -113,7 +128,8 @@ export class App extends React.Component {
           currentChatId={this.state.currentChatId}
           currentChatIndex={this.state.currentChatIndex}
           chats={this.state.chats}
-          chatUsers={this.state.chatUsers}/>
+          chatUsers={this.state.chatUsers}
+          disconnectChat={this.disconnectChat.bind(this)}/>
         <div className={!this.state.initialized ? "reaction-screen" : "reaction-screen hidden"}>
           <ReactionScreen setUserInfo={this.setUserInfo.bind(this)}/>
         </div>
