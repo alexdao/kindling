@@ -20599,6 +20599,9 @@ var Messages = exports.Messages = function (_React$Component) {
         composerValue: msg_formatted.myself == false ? this.state.composerValue : ''
       }, function () {
         document.getElementById("composer").disabled = false;
+        if (msg_formatted.myself) {
+          document.getElementById("composer").focus();
+        }
         var container = document.getElementById('messages-container');
         container.scrollTop = container.scrollHeight;
       });

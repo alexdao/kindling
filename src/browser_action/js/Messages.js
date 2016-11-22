@@ -43,6 +43,9 @@ export class Messages extends React.Component {
       composerValue: msg_formatted.myself == false ? this.state.composerValue : ''
     }, () => {
       document.getElementById("composer").disabled = false;
+      if (msg_formatted.myself) {
+        document.getElementById("composer").focus();
+      }
       const container = document.getElementById('messages-container');
       container.scrollTop = container.scrollHeight;
     });
